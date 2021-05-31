@@ -3,7 +3,9 @@ from rest_framework.response import Response
 
 from knox.models import AuthToken
 
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, BarberAddressSerializer, UserAddressSerializer
+
+from django.contrib.auth.models import User
 
 
 class RegisterView(generics.GenericAPIView):
@@ -48,3 +50,41 @@ class UserView(generics.RetrieveAPIView):
     def get_object(self):
         user = self.request.user
         return user
+
+
+class BarberAddressView(generics.GenericAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    serializer_class = BarberAddressSerializer
+
+
+    def post(self, request):
+        user_id = request.user.id
+        serializer = self.get_serializer(data={'id':user_id, **request.data})
+        serializer.is_valid(raise_exception=True)
+        address = serializer.save()
+
+        print(address)
+
+        return Response({'barberaddress': 'barberaddress'})
+
+
+class UserAddressView(generics.GenericAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    serializer_class = UserAddressSerializer
+
+
+    def post(self, request):
+        user_id = request.user.id
+        serializer = self.get_serializer(data={'id': user_id, **request.data})
+        serializer.is_valid(raise_exception=True)
+        address = serializer.save()
+
+        print(address)
+
+        return Response({'useraddress': 'useraddress'})
