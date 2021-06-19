@@ -1,14 +1,18 @@
 from django.urls import path, include
-from .api import RegisterView, LoginView, UserView, BarberAddressView, UserAddressView
-from knox.views import LogoutView, LogoutAllView
+from .views import UserDetailsView, BarberDetailsView
+from .register import RegistrationView, LoginView, EmailView, PasswordReset
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
-    path('api/auth', include('knox.urls')),
-    path('api/auth/register', RegisterView.as_view()),
-    path('api/auth/login', LoginView.as_view()),
-    path('api/auth/user', UserView.as_view()),
-    path('api/auth/logout', LogoutView.as_view(), name="knox_logout"),
-    path('api/auth/logoutall', LogoutAllView.as_view(), name="knox_logoutall"),
-    path('api/auth/barberaddress', BarberAddressView.as_view()),
-    path('api/auth/useraddress', UserAddressView.as_view())
+    path('api/accounts/knox', include('knox.urls')),
+    path('api/accounts/register', RegistrationView.as_view()),
+    path('api/accounts/login', LoginView.as_view()),
+    path('api/accounts/verifyemail', EmailView.as_view()),
+    path('api/accounts/passwordreset', PasswordReset.as_view()),
+    path('api/accounts/userdetails', UserDetailsView.as_view()),
+    path('api/accounts/barberdetails', BarberDetailsView.as_view()),
+
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

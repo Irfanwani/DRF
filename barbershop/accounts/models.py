@@ -1,29 +1,54 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 
-# User details
+# Create your models here.
+# Auth models
+class Emails(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	email = models.EmailField()
+
+	def __str__(self):
+		return f'New email {self.email} added to the user {self.user}'
+
+
+class SignUpCodes(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	code = models.PositiveBigIntegerField()
+
+	def __str__(self):
+		return f'{self.code} created for user {self.user}'
+
+
+class PasswordCodes(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	code = models.PositiveBigIntegerField()
+
+	def __str__(self):
+		return f'{self.code} created for user {self.user}'
+
+
+
+# Detail models
 class UserDetails(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    image = models.ImageField(upload_to='images/', blank=True)
+    image = models.ImageField(upload_to='image/')
     coords = models.PointField(null=False, blank=False, srid=4326, verbose_name='coords')
-    location = models.CharField(max_length=200, null=False, blank=False)
-    about = models.CharField(max_length=1000, null=False, blank=True)
-    website = models.URLField(max_length=200, null=False, blank=True)
+    location = models.CharField(max_length=1000)
+    about = models.TextField(null=False, blank=True)
+    contact = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return f"User details for user with id {self.id} added"
+        return f'User details for the user with id {id} added'
 
 
-# Barber details
 class BarberDetails(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    image = models.ImageField(upload_to='images/', blank=True)
+    image = models.ImageField(upload_to='image/')
     coords = models.PointField(null=False, blank=False, srid=4326, verbose_name='coords')
-    location = models.CharField(max_length=200, null=False, blank=False)
-    about = models.CharField(max_length=1000, null=False, blank=True)
-    website = models.URLField(max_length=200, null=False, blank=True)
-    employee_count = models.PositiveIntegerField(null=False, blank=False)
-
+    location = models.CharField(max_length=1000)
+    about = models.TextField(null=False, blank=True)
+    contact = models.CharField(max_length=200, blank=True)
+    employee_count = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"Barber details for the user with id {self.id} added"
+        return f'Barber details for the user with id {id} added'
