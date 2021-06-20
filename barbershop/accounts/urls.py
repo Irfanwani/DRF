@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('api/accounts/knox', include('knox.urls')),
+    path('api/accounts/', include('knox.urls')),
     path('api/accounts/register', RegistrationView.as_view()),
     path('api/accounts/login', LoginView.as_view()),
     path('api/accounts/verifyemail', EmailView.as_view()),

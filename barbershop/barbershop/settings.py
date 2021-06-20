@@ -62,14 +62,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+""" EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('AUTHEMAIL_EMAIL_HOST') or '<YOUR_EMAIL_HOST>'
 EMAIL_PORT = os.environ.get('AUTHEMAIL_EMAIL_PORT') or 587
 EMAIL_HOST_USER = os.environ.get('AUTHEMAIL_EMAIL_HOST_USER') or '<HOST_EMAIL_USER_NAME>'
 EMAIL_HOST_PASSWORD = os.environ.get('AUTHEMAIL_EMAIL_HOST_PASSWORD') or '<HOST_PASSWORD>'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-DEFAULT_FROM_EMAIL = '<YOUR_EMAIL>'
+DEFAULT_FROM_EMAIL = '<YOUR_EMAIL>' """
+
+
 
 
 MIDDLEWARE = [

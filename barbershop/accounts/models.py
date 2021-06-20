@@ -8,12 +8,12 @@ class Emails(models.Model):
 	email = models.EmailField()
 
 	def __str__(self):
-		return f'New email {self.email} added to the user {self.user}'
+		return f'Email {self.email} verified for the user {self.user}'
 
 
 class SignUpCodes(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	code = models.PositiveBigIntegerField()
+	code = models.CharField(max_length=15)
 
 	def __str__(self):
 		return f'{self.code} created for user {self.user}'
@@ -21,7 +21,7 @@ class SignUpCodes(models.Model):
 
 class PasswordCodes(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
-	code = models.PositiveBigIntegerField()
+	code = models.CharField(max_length=15)
 
 	def __str__(self):
 		return f'{self.code} created for user {self.user}'
