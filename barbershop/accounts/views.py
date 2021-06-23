@@ -22,7 +22,7 @@ class UserDetailsView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         coords = Point(int(request.data['lng']), int(request.data['lat']))
 
-        request.data.update({'coords': coords})
+        request.data.update({'id': request.user.id, 'coords': coords})
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -45,7 +45,7 @@ class BarberDetailsView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         coords = Point(int(request.data['lng']), int(request.data['lat']))
 
-        request.data.update({'coords': coords})
+        request.data.update({'id': request.user.id, 'coords': coords})
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

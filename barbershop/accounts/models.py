@@ -38,7 +38,7 @@ class UserDetails(models.Model):
     contact = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
-        return f'User details for the user with id {id} added'
+        return f'User details for the user {self.id} added'
 
 
 class BarberDetails(models.Model):
@@ -51,4 +51,4 @@ class BarberDetails(models.Model):
     employee_count = models.PositiveIntegerField()
 
     def __str__(self):
-        return f'Barber details for the user with id {id} added'
+        return f'Barber details for the user {self.id} added'

@@ -28,7 +28,6 @@ class RegistrationView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         user = serializer.save()
-        print(user)
 
         # verification code creation and send to the user email
         verCode = verificationCode()
@@ -62,19 +61,28 @@ class EmailView(generics.GenericAPIView):
     def get(self, request):
         code = verificationCode()
         try:
-            SignUpCodes.objects.filter(
-                user=User.objects.get(username=request.user)).delete()
+            Emails.objects.get(user=User.objects.get(
+                username=request.user.username))
+            return Response({
+                'verified': 'verified',
+                'message': 'Email already verified'
+            })
         except:
-            pass
+            try:
+                SignUpCodes.objects.filter(
+                    user=User.objects.get(username=request.user)).delete()
+            except:
+                pass
 
-        SignUpCodes.objects.create(user=request.user, code=code)
+            SignUpCodes.objects.create(user=request.user, code=code)
 
-        send_mail(subject='Email verification', message=f'Here is the email verification code {code}', from_email=getattr(
-            settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f"{request.user.email}"], fail_silently=False)
+            send_mail(subject='Email verification', message=f'Here is the email verification code {code}', from_email=getattr(
+                settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f"{request.user.email}"], fail_silently=False)
 
-        return Response({
-            'message': 'Email verification code sent to your email.'
-        })
+            return Response({
+                'message': 'Email verification code sent to your email.'
+            })
+
 
     def post(self, request):
         try:
