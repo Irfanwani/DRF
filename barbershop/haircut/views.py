@@ -1,4 +1,4 @@
-from rest_framework import permissions, generics
+from rest_framework import permissions, generics, serializers
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from accounts.models import BarberDetails
@@ -59,7 +59,8 @@ class AppointmentView(generics.GenericAPIView):
         # Check if datetime is in future not past or present and receiving the current datetime from the frontend
         try:
             currentDateTime = request.data['currentdatetime']
-            parsedCurrentDate = datetime.strptime(currentDateTime, "%m/%d/%Y, %I:%M:%S %p")
+            parsedCurrentDate = datetime.strptime(
+                currentDateTime, "%m/%d/%Y, %I:%M:%S %p")
 
             if parsedDate <= parsedCurrentDate:
                 return Response({
@@ -73,21 +74,22 @@ class AppointmentView(generics.GenericAPIView):
         # Check if all spots all taken for a particular time
         try:
             apnts = Appointments.objects.filter(barber=barber)
-            takenSpots = [apnt.datetime for apnt in apnts if datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") == parsedDate]
-            
+            takenSpots = [apnt.datetime for apnt in apnts if datetime.strptime(
+                apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") == parsedDate]
+
             if len(takenSpots) >= barber.employee_count:
                 return Response({
                     'message': 'All spots for the selected time are already taken! Please select a different time.'
                 })
 
-            fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=15) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p")) or (parsedDate + timedelta(minutes=15) > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p"))]
+            fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=15) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime(
+                "%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p")) or (parsedDate + timedelta(minutes=15) > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p"))]
 
             if len(fixedAppointments) > 0:
                 return Response({
                     'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 15 minutes.'
                 })
 
-            
         except:
             pass
 
@@ -106,3 +108,23 @@ class AppointmentView(generics.GenericAPIView):
         return Response({
             'message': "appointment fixed successfully!"
         })
+
+
+class CancelAppointment(generics.DestroyAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+    queryset = Appointments.objects.all()
+    serializer_class = AppointmentSerializer
+
+    def perform_destroy(self, instance):
+        if instance.user == self.request.user:
+            send_mail(subject=f"Appointment {self.request.data['type']}", message=f"One of your appointments was {self.request.data['type']}. Please check that from the app.", from_email=getattr(
+                settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{self.request.user.email}', f'{instance.barber.id.email}'])
+            return instance.delete()
+
+        raise serializers.ValidationError(
+            'You cannot delete other\'s appointment.')
+
+
+# Now it is time to integrate payment gateway
