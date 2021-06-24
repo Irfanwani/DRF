@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, serializers
 from rest_framework.response import Response
 
 from knox.models import AuthToken
@@ -238,3 +238,21 @@ class PasswordReset(generics.GenericAPIView):
             return Response({
                 'message': 'Please check the fields. (Check your new password).'
             })
+
+
+# Account deletion
+class DeleteUser(generics.DestroyAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    queryset = User.objects.all()
+    serializer_class = RegistrationSerializer
+
+    def perform_destroy(self, instance):
+        if instance == self.request.user:
+            send_mail(subject='Account deletion request.', message=f'Account deletion request from your account with username {instance.username} has been approved. Your account has been deleted successfully!', from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{instance.email}'])
+
+            return instance.delete()
+
+        raise serializers.ValidationError('You are not authorized to perform this action!')

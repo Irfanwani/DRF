@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import UserDetailsView, BarberDetailsView
-from .register import RegistrationView, LoginView, EmailView, PasswordReset
+from .register import RegistrationView, LoginView, EmailView, PasswordReset, DeleteUser
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/accounts/passwordreset', PasswordReset.as_view()),
     path('api/accounts/userdetails', UserDetailsView.as_view()),
     path('api/accounts/barberdetails', BarberDetailsView.as_view()),
+    path('api/accounts/deleteuser/<int:pk>', DeleteUser.as_view()),
 
 ]
 

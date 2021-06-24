@@ -2,7 +2,7 @@ from accounts.models import UserDetails, BarberDetails
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-
+from django.contrib.gis.geos import Point
 # user serialization
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,6 +50,29 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = UserDetails
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        try:
+            instance.image = validated_data['image']
+        except:
+            pass
+        try:
+            instance.coords = validated_data['coords']
+        except:
+            pass
+        try:
+            instance.location = validated_data['location']
+        except:
+            pass
+        try:
+            instance.about = validated_data['about']
+        except:
+            pass
+        try:
+            instance.contact = validated_data['contact']
+        except:
+            pass
+        instance.save()
+        return instance
 
 # Barber details serialization
 class BarberDetailSerializer(serializers.ModelSerializer):
@@ -57,3 +80,30 @@ class BarberDetailSerializer(serializers.ModelSerializer):
         model = BarberDetails
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        try:
+            instance.image = validated_data['image']
+        except:
+            pass
+        try:
+            instance.coords = validated_data['coords']
+        except:
+            pass
+        try:
+            instance.location = validated_data['location']
+        except:
+            pass
+        try:
+            instance.about = validated_data['about']
+        except:
+            pass
+        try:
+            instance.contact = validated_data['contact']
+        except:
+            pass
+        try:
+            instance.employee_count = validated_data['employee_count']
+        except:
+            pass
+        instance.save()
+        return instance
