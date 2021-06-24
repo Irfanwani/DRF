@@ -49,6 +49,8 @@ class BarberDetails(models.Model):
     about = models.TextField(null=False, blank=True)
     contact = models.CharField(max_length=200, blank=True)
     employee_count = models.PositiveIntegerField()
+    start_time = models.TimeField()
+    end_time = models.TimeField()
 
     def __str__(self):
         return f'Barber details for the user {self.id} added'

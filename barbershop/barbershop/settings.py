@@ -74,7 +74,14 @@ EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = '<YOUR_EMAIL>' """
 
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_HOST = os.environ.get('AUTHEMAIL_EMAIL_HOST') or 'smtp.sendgrid.net'
+# EMAIL_PORT = os.environ.get('AUTHEMAIL_EMAIL_PORT') or 587
+# EMAIL_HOST_USER = os.environ.get('AUTHEMAIL_EMAIL_HOST_USER') or 'apikey'
+# EMAIL_HOST_PASSWORD = os.environ.get('AUTHEMAIL_EMAIL_HOST_PASSWORD') or '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'
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+# DEFAULT_FROM_EMAIL = 'barbershopservices@gmail.com'
 
 
 MIDDLEWARE = [

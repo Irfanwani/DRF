@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 
 from django.conf import settings
 from django.core.mail import send_mail
+from datetime import datetime
 # Create your views here.
 
 
@@ -94,7 +95,7 @@ class BarberDetailsView(generics.GenericAPIView):
         # Passing the sorted barbers to the serializer and adding the distance to be returned with the Response
         serializer = self.get_serializer(sortedQueryset, many=True)
         [barber.update({'username': User.objects.get(id=barber['id']).username, 'Distance': [round(b.distance.km, 2)
-                       for b in sortedQueryset if b.id == User.objects.get(id=barber['id'])][0]}) for barber in serializer.data]
+                       for b in sortedQueryset if b.id == User.objects.get(id=barber['id'])][0], 'start_time': datetime.strptime(barber['start_time'], "%H:%M:%S").strftime("%I:%M %p"), 'end_time': datetime.strptime(barber['end_time'], "%H:%M:%S").strftime("%I:%M %p")}) for barber in serializer.data]
 
         details = serializer.data
         return Response(details)
@@ -108,7 +109,19 @@ class BarberDetailsView(generics.GenericAPIView):
                 'message': 'Something went wrong. Please try again.'
             })
 
-        request.data.update({'id': request.user.id, 'coords': coords})
+        try:
+            start_time = request.data['start_time']
+            end_time = request.data['end_time']
+
+            parsed_st = datetime.strptime(start_time, "%I:%M %p").time()
+            parsed_et = datetime.strptime(end_time, "%I:%M %p").time()
+        except:
+            return Response({
+                'message': 'Please provide both opening and closing time of your barbershop.'
+            })
+
+        request.data.update({'id': request.user.id, 'coords': coords,
+                            'start_time': parsed_st, 'end_time': parsed_et})
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -126,6 +139,16 @@ class BarberDetailsView(generics.GenericAPIView):
             coords = Point(
                 float(request.data['lng']), float(request.data['lat']))
             request.data.update({'coords': coords})
+        except:
+            pass
+
+        try:
+            start_time = request.data['start_time']
+            end_time = request.data['end_time']
+
+            parsed_st = datetime.strptime(start_time, "%I:%M %p").time()
+            parsed_et = datetime.strptime(end_time, "%I:%M %p").time()
+            request.data.update({'start_time': parsed_st, 'end_time': parsed_et})
         except:
             pass
 

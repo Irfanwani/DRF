@@ -47,10 +47,14 @@ class AppointmentView(generics.GenericAPIView):
                 'message': 'This barber has no saved details. Please check again.'
             })
 
-        # check if a valid datetime format was given
+        # check if a valid datetime format and in proper range was given
         try:
             dt = request.data['datetime']
             parsedDate = datetime.strptime(dt, "%d/%m/%Y %I:%M %p")
+            if parsedDate.time() < barber.start_time or parsedDate.time() > barber.end_time:
+                return Response({
+                    'message': f'Please select a time from {barber.start_time.strftime("%I:%M %p")} to {barber.end_time.strftime("%I:%M %p")}'
+                })
         except:
             return Response({
                 'message': "please provide a valid date and time for the appointment."
@@ -71,15 +75,15 @@ class AppointmentView(generics.GenericAPIView):
                 'message': 'There was some problem. Please try again!'
             })
 
-        # Check if all spots all taken for a particular time
+        # Check if all spots all taken for a particular time otherwise return the error message and the taken times.
         try:
             apnts = Appointments.objects.filter(barber=barber)
             takenSpots = [apnt.datetime for apnt in apnts if datetime.strptime(
                 apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") == parsedDate]
-
             if len(takenSpots) >= barber.employee_count:
                 return Response({
-                    'message': 'All spots for the selected time are already taken! Please select a different time.'
+                    'message': 'All spots for the selected time are already taken! Please select a different time.',
+                    'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
                 })
 
             fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=15) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime(
@@ -87,7 +91,9 @@ class AppointmentView(generics.GenericAPIView):
 
             if len(fixedAppointments) > 0:
                 return Response({
-                    'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 15 minutes.'
+                    'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 15 minutes.',
+                    'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
+
                 })
 
         except:

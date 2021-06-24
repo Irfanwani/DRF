@@ -105,5 +105,13 @@ class BarberDetailSerializer(serializers.ModelSerializer):
             instance.employee_count = validated_data['employee_count']
         except:
             pass
+        try:
+            instance.start_time = validated_data['start_time']
+        except:
+            pass
+        try:
+            instance.end_time = validated_data['end_time']
+        except:
+            pass
         instance.save()
         return instance
