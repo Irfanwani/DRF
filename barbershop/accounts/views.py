@@ -1,5 +1,5 @@
-from accounts.models import BarberDetails, UserDetails
-from rest_framework import generics, permissions
+from .models import BarberDetails, UserDetails
+from rest_framework import generics, permissions, status
 from .serializers import UserDetailSerializer, BarberDetailSerializer
 
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -30,7 +30,7 @@ class UserDetailsView(generics.GenericAPIView):
         except:
             return Response({
                 'message': 'Something went wrong. Please try again.'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         request.data.update({'id': request.user.id, 'coords': coords})
 
@@ -90,7 +90,7 @@ class BarberDetailsView(generics.GenericAPIView):
         except:
             return Response({
                 'message': 'Please upload your address details to see barbers nearest to you.'
-            })
+            }, status.HTTP_403_FORBIDDEN)
 
         # Passing the sorted barbers to the serializer and adding the distance to be returned with the Response
         serializer = self.get_serializer(sortedQueryset, many=True)
@@ -107,7 +107,7 @@ class BarberDetailsView(generics.GenericAPIView):
         except:
             return Response({
                 'message': 'Something went wrong. Please try again.'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         try:
             start_time = request.data['start_time']
@@ -118,7 +118,7 @@ class BarberDetailsView(generics.GenericAPIView):
         except:
             return Response({
                 'message': 'Please provide both opening and closing time of your barbershop.'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         request.data.update({'id': request.user.id, 'coords': coords,
                             'start_time': parsed_st, 'end_time': parsed_et})

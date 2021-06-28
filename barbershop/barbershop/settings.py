@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-=ghkqe8kp(e019v4u4(0_=7=7#vh5nh@bz!1qc*4_a3)+neu=3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.43.176', 'localhost', '127.0.0.1']
 
 
 if os.name == 'nt':
@@ -62,6 +62,10 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
+}
+
+REST_KNOX = {
+    'TOKEN_TTL': None
 }
 
 """ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

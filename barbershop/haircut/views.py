@@ -1,4 +1,4 @@
-from rest_framework import permissions, generics, serializers
+from rest_framework import permissions, generics, serializers, status
 from rest_framework.response import Response
 from django.core.mail import send_mail
 from accounts.models import BarberDetails
@@ -33,7 +33,7 @@ class AppointmentView(generics.GenericAPIView):
         if len(appointments) <= 0:
             return Response({
                 'message': "No appointment fixed!"
-            })
+            }, status.HTTP_404_NOT_FOUND)
 
         return Response(appointments)
 
@@ -45,7 +45,7 @@ class AppointmentView(generics.GenericAPIView):
         except:
             return Response({
                 'message': 'This barber has no saved details. Please check again.'
-            })
+            }, status.HTTP_404_NOT_FOUND)
 
         # check if a valid datetime format and in proper range was given
         try:
@@ -58,7 +58,7 @@ class AppointmentView(generics.GenericAPIView):
         except:
             return Response({
                 'message': "please provide a valid date and time for the appointment."
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         # Check if datetime is in future not past or present and receiving the current datetime from the frontend
         try:
@@ -69,11 +69,11 @@ class AppointmentView(generics.GenericAPIView):
             if parsedDate <= parsedCurrentDate:
                 return Response({
                     'message': 'Please choose a valid date and time. You can\'t submit an appointment for a past time.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
         except:
             return Response({
                 'message': 'There was some problem. Please try again!'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         # Check if all spots all taken for a particular time otherwise return the error message and the taken times.
         try:
@@ -84,7 +84,7 @@ class AppointmentView(generics.GenericAPIView):
                 return Response({
                     'message': 'All spots for the selected time are already taken! Please select a different time.',
                     'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
-                })
+                }, status.HTTP_406_NOT_ACCEPTABLE)
 
             fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=15) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime(
                 "%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p")) or (parsedDate + timedelta(minutes=15) > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p"))]
@@ -94,7 +94,7 @@ class AppointmentView(generics.GenericAPIView):
                     'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 15 minutes.',
                     'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
 
-                })
+                }, status.HTTP_406_NOT_ACCEPTABLE)
 
         except:
             pass

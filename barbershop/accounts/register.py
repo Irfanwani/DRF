@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions, serializers
+from rest_framework import generics, permissions, serializers, status
 from rest_framework.response import Response
 
 from knox.models import AuthToken
@@ -99,7 +99,7 @@ class EmailView(generics.GenericAPIView):
             except:
                 return Response({
                     'message': 'Please provide a verification code'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
             try:
                 db_code = SignUpCodes.objects.get(
@@ -121,13 +121,12 @@ class EmailView(generics.GenericAPIView):
                     })
 
                 return Response({
-                    'verified': 'not verified',
                     'message': 'Please provide a valid verification code.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
             except:
                 return Response({
                     'message': "There is no code registered on your name. Click the 'resend' button to receive the code on your registered email."
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
 
 # Login
@@ -180,12 +179,12 @@ class PasswordReset(generics.GenericAPIView):
             except:
                 return Response({
                     'message': 'Please provide a registered email address.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
         except:
             return Response({
                 'message': 'Provide an email to get the verification code.'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
         try:
@@ -194,7 +193,7 @@ class PasswordReset(generics.GenericAPIView):
             except:
                 return Response({
                     'message': 'Please enter a verification code.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
             try:
                 email = request.data['email']
@@ -202,14 +201,14 @@ class PasswordReset(generics.GenericAPIView):
             except:
                 return Response({
                     'message': 'Please provide a registered email address.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
             try:
                 db_code = PasswordCodes.objects.get(user=reg_user).code
             except:
                 return Response({
                     'message': 'There is no password reset code registered on this email address. Click the RESEND button to receive it again.'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
 
             if code == db_code:
                 serializer = self.get_serializer(
@@ -232,12 +231,12 @@ class PasswordReset(generics.GenericAPIView):
 
             return Response({
                 'message': 'Invalid verification code.'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
         except:
             return Response({
                 'message': 'Please check the fields. (Check your new password).'
-            })
+            }, status.HTTP_400_BAD_REQUEST)
 
 
 # Account deletion
