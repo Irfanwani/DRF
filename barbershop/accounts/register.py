@@ -178,12 +178,12 @@ class PasswordReset(generics.GenericAPIView):
                 })
             except:
                 return Response({
-                    'message': 'Please provide a registered email address.'
+                    'email': 'Please provide a registered email address.'
                 }, status.HTTP_400_BAD_REQUEST)
 
         except:
             return Response({
-                'message': 'Provide an email to get the verification code.'
+                'email': 'Provide an email to get the verification code.'
             }, status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
@@ -192,7 +192,7 @@ class PasswordReset(generics.GenericAPIView):
                 code = request.data['code']
             except:
                 return Response({
-                    'message': 'Please enter a verification code.'
+                    'code': 'Please enter a verification code.'
                 }, status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -200,14 +200,14 @@ class PasswordReset(generics.GenericAPIView):
                 reg_user = User.objects.get(email=email)
             except:
                 return Response({
-                    'message': 'Please provide a registered email address.'
+                    'email': 'Please provide a registered email address.'
                 }, status.HTTP_400_BAD_REQUEST)
 
             try:
                 db_code = PasswordCodes.objects.get(user=reg_user).code
             except:
                 return Response({
-                    'message': 'There is no password reset code registered on this email address. Click the RESEND button to receive it again.'
+                    'code': 'There is no password reset code registered on this email address. Click the GET VERIFICATION CODE button to receive it again.'
                 }, status.HTTP_400_BAD_REQUEST)
 
             if code == db_code:
@@ -230,7 +230,7 @@ class PasswordReset(generics.GenericAPIView):
                 })
 
             return Response({
-                'message': 'Invalid verification code.'
+                'code': 'Invalid verification code.'
             }, status.HTTP_400_BAD_REQUEST)
 
         except:

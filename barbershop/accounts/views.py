@@ -1,3 +1,4 @@
+from django.http.request import QueryDict
 from .models import BarberDetails, UserDetails
 from rest_framework import generics, permissions, status
 from .serializers import UserDetailSerializer, BarberDetailSerializer
@@ -25,8 +26,11 @@ class UserDetailsView(generics.GenericAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
         try:
-            coords = Point(int(request.data['lng']), int(request.data['lat']))
+            coords = Point(
+                float(request.data['lng']), float(request.data['lat']))
         except:
             return Response({
                 'message': 'Something went wrong. Please try again.'
@@ -46,6 +50,9 @@ class UserDetailsView(generics.GenericAPIView):
         })
 
     def put(self, request):
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
+
         try:
             coords = Point(
                 float(request.data['lng']), float(request.data['lat']))
@@ -101,6 +108,9 @@ class BarberDetailsView(generics.GenericAPIView):
         return Response(details)
 
     def post(self, request, *args, **kwargs):
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
+
         try:
             coords = Point(
                 float(request.data['lng']), float(request.data['lat']))
@@ -113,11 +123,11 @@ class BarberDetailsView(generics.GenericAPIView):
             start_time = request.data['start_time']
             end_time = request.data['end_time']
 
-            parsed_st = datetime.strptime(start_time, "%I:%M %p").time()
-            parsed_et = datetime.strptime(end_time, "%I:%M %p").time()
+            parsed_st = datetime.strptime(start_time, "%H:%M").time()
+            parsed_et = datetime.strptime(end_time, "%H:%M").time()
         except:
             return Response({
-                'message': 'Please provide both opening and closing time of your barbershop.'
+                'start_end_error': 'Please provide both opening and closing time of your barbershop.'
             }, status.HTTP_400_BAD_REQUEST)
 
         request.data.update({'id': request.user.id, 'coords': coords,
@@ -135,6 +145,9 @@ class BarberDetailsView(generics.GenericAPIView):
         })
 
     def put(self, request):
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
+
         try:
             coords = Point(
                 float(request.data['lng']), float(request.data['lat']))
@@ -146,9 +159,10 @@ class BarberDetailsView(generics.GenericAPIView):
             start_time = request.data['start_time']
             end_time = request.data['end_time']
 
-            parsed_st = datetime.strptime(start_time, "%I:%M %p").time()
-            parsed_et = datetime.strptime(end_time, "%I:%M %p").time()
-            request.data.update({'start_time': parsed_st, 'end_time': parsed_et})
+            parsed_st = datetime.strptime(start_time, "%H:%M").time()
+            parsed_et = datetime.strptime(end_time, "%H:%M").time()
+            request.data.update(
+                {'start_time': parsed_st, 'end_time': parsed_et})
         except:
             pass
 
