@@ -14,6 +14,7 @@ from django.conf import settings
 import random
 import string
 
+
 def verificationCode():
     specials = "@#$%^&*"
     return ''.join([random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits + specials) for n in range(random.randint(8, 12))])
@@ -57,7 +58,6 @@ class EmailView(generics.GenericAPIView):
         permissions.IsAuthenticated
     ]
 
-
     def get(self, request):
         code = verificationCode()
         try:
@@ -82,7 +82,6 @@ class EmailView(generics.GenericAPIView):
             return Response({
                 'message': 'Email verification code sent to your email.'
             })
-
 
     def post(self, request):
         try:
@@ -139,6 +138,13 @@ class LoginView(generics.GenericAPIView):
 
         user = serializer.validated_data
         email = User.objects.get(username=user).email
+
+        try:
+            Emails.objects.get(email=email)
+            verified = 'verified'
+        except:
+            verified = None
+
         _, token = AuthToken.objects.create(user)
 
         send_mail(subject='Login success!', message=f'Login successfull. You successfully Logged in', from_email=getattr(
@@ -146,7 +152,8 @@ class LoginView(generics.GenericAPIView):
 
         return Response({
             'user': UserSerializer(user, context=self.get_serializer_context()).data,
-            'token': token
+            'token': token,
+            'verified': verified
         })
 
 
@@ -178,12 +185,12 @@ class PasswordReset(generics.GenericAPIView):
                 })
             except:
                 return Response({
-                    'email': 'Please provide a registered email address.'
+                    'email_error': 'Please provide a registered email address.'
                 }, status.HTTP_400_BAD_REQUEST)
 
         except:
             return Response({
-                'email': 'Provide an email to get the verification code.'
+                'email_error': 'Provide an email to get the verification code.'
             }, status.HTTP_400_BAD_REQUEST)
 
     def put(self, request):
@@ -200,7 +207,7 @@ class PasswordReset(generics.GenericAPIView):
                 reg_user = User.objects.get(email=email)
             except:
                 return Response({
-                    'email': 'Please provide a registered email address.'
+                    'email_error': 'Please provide a registered email address.'
                 }, status.HTTP_400_BAD_REQUEST)
 
             try:
@@ -223,10 +230,18 @@ class PasswordReset(generics.GenericAPIView):
                 send_mail(subject='Password changed successfully!', message=f'Your password was updated successfully!',
                           from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f"{email}"], fail_silently=False)
 
+                try:
+                    Emails.objects.get(email=email)
+                    verified = 'verified'
+                except:
+                    verified = None
+
+
                 _, token = AuthToken.objects.create(user)
                 return Response({
                     'user': UserSerializer(user, context=self.get_serializer_context()).data,
-                    'token': token
+                    'token': token,
+                    'verified': verified
                 })
 
             return Response({
@@ -250,8 +265,10 @@ class DeleteUser(generics.DestroyAPIView):
 
     def perform_destroy(self, instance):
         if instance == self.request.user:
-            send_mail(subject='Account deletion request.', message=f'Account deletion request from your account with username {instance.username} has been approved. Your account has been deleted successfully!', from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{instance.email}'])
+            send_mail(subject='Account deletion request.', message=f'Account deletion request from your account with username {instance.username} has been approved. Your account has been deleted successfully!', from_email=getattr(
+                settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{instance.email}'])
 
             return instance.delete()
 
-        raise serializers.ValidationError('You are not authorized to perform this action!')
+        raise serializers.ValidationError(
+            'You are not authorized to perform this action!')
