@@ -1,5 +1,6 @@
 from django.http.request import QueryDict
-from .models import BarberDetails, UserDetails
+from rest_framework.views import APIView
+from .models import BarberDetails, Emails, UserDetails
 from rest_framework import generics, permissions, status
 from .serializers import UserDetailSerializer, BarberDetailSerializer
 
@@ -178,4 +179,52 @@ class BarberDetailsView(generics.GenericAPIView):
 
         return Response({
             'details': BarberDetailSerializer(details, context=self.get_serializer_context()).data
+        })
+
+
+class GetBarber(generics.RetrieveAPIView):
+    queryset = BarberDetails.objects.all()
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    serializer_class = BarberDetailSerializer
+    
+
+class GetUser(generics.RetrieveAPIView):
+    queryset = UserDetails.objects.all()
+
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    serializer_class = UserDetailSerializer
+    
+
+class AuthenticateUser(APIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def get(self, request):
+        try:
+            Emails.objects.get(email=request.user.email)
+            verified = 'verified'
+        except:
+            verified = None
+        
+        try:
+            try:
+                BarberDetails.objects.get(id=request.user.id)
+                details = 'submitted'
+            except:
+                UserDetails.objects.get(id=request.user.id)
+                details = 'submitted'
+        except:
+            details = None
+
+        return Response({
+            'verified': verified,
+            'details': details
         })

@@ -1,3 +1,5 @@
+from django.db.models import Q
+from django.http.request import QueryDict
 from rest_framework import permissions, generics, serializers, status
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -22,11 +24,11 @@ class AppointmentView(generics.GenericAPIView):
     def get(self, request):
 
         serializer = self.get_serializer(
-            self.get_queryset().filter(user=request.user), many=True)
+            self.get_queryset().filter(Q(user=request.user) | Q(barber=BarberDetails.objects.get(id=request.user.id))), many=True)
 
         # Converting datetime into human-readable string
         [app.update({'datetime': datetime.strptime(
-            app['datetime'], "%Y-%m-%dT%H:%M:%SZ").strftime("%A, %b %d, %Y %I:%M:%S %p")}) for app in serializer.data]
+            app['datetime'], "%Y-%m-%dT%H:%M:%SZ").strftime("%A, %b %d, %Y %I:%M:%S %p"), 'user': User.objects.get(id=app['user']).username, 'barber': User.objects.get(id=app['barber']).username}) for app in serializer.data]
 
         appointments = serializer.data
 
@@ -38,6 +40,8 @@ class AppointmentView(generics.GenericAPIView):
         return Response(appointments)
 
     def post(self, request):
+        if isinstance(request.data, QueryDict):
+            request.data._mutable = True
         # Check if the barber exists
         try:
             barber = BarberDetails.objects.get(
@@ -50,11 +54,11 @@ class AppointmentView(generics.GenericAPIView):
         # check if a valid datetime format and in proper range was given
         try:
             dt = request.data['datetime']
-            parsedDate = datetime.strptime(dt, "%d/%m/%Y %I:%M %p")
+            parsedDate = datetime.strptime(dt, "%a %b %d %Y %H:%M")
             if parsedDate.time() < barber.start_time or parsedDate.time() > barber.end_time:
                 return Response({
                     'message': f'Please select a time from {barber.start_time.strftime("%I:%M %p")} to {barber.end_time.strftime("%I:%M %p")}'
-                })
+                }, status.HTTP_400_BAD_REQUEST)
         except:
             return Response({
                 'message': "please provide a valid date and time for the appointment."
@@ -64,11 +68,11 @@ class AppointmentView(generics.GenericAPIView):
         try:
             currentDateTime = request.data['currentdatetime']
             parsedCurrentDate = datetime.strptime(
-                currentDateTime, "%m/%d/%Y, %I:%M:%S %p")
+                currentDateTime, "%a %b %d %Y %H:%M")
 
             if parsedDate <= parsedCurrentDate:
                 return Response({
-                    'message': 'Please choose a valid date and time. You can\'t submit an appointment for a past time.'
+                    'message': 'Please choose a valid date and time. Future times are only treated as valid.'
                 }, status.HTTP_400_BAD_REQUEST)
         except:
             return Response({
@@ -125,12 +129,10 @@ class CancelAppointment(generics.DestroyAPIView):
 
     def perform_destroy(self, instance):
         if instance.user == self.request.user:
-            send_mail(subject=f"Appointment {self.request.data['type']}", message=f"One of your appointments was {self.request.data['type']}. Please check that from the app.", from_email=getattr(
-                settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{self.request.user.email}', f'{instance.barber.id.email}'])
             return instance.delete()
 
         raise serializers.ValidationError(
-            'You cannot delete other\'s appointment.')
+            'You cannot change other\'s appointment.')
 
 
 # Now it is time to integrate payment gateway
