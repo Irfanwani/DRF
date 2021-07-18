@@ -1,11 +1,13 @@
 from django.http.request import QueryDict
+
 from rest_framework.views import APIView
-from .models import BarberDetails, Emails, UserDetails
 from rest_framework import generics, permissions, status
+
+from .models import BarberDetails, Emails, UserDetails
 from .serializers import UserDetailSerializer, BarberDetailSerializer
+from .register import check
 
 from rest_framework.parsers import MultiPartParser, FormParser
-
 from rest_framework.response import Response
 
 from django.contrib.gis.geos import Point
@@ -190,7 +192,7 @@ class GetBarber(generics.RetrieveAPIView):
     ]
 
     serializer_class = BarberDetailSerializer
-    
+
 
 class GetUser(generics.RetrieveAPIView):
     queryset = UserDetails.objects.all()
@@ -200,7 +202,7 @@ class GetUser(generics.RetrieveAPIView):
     ]
 
     serializer_class = UserDetailSerializer
-    
+
 
 class AuthenticateUser(APIView):
     permission_classes = [
@@ -208,21 +210,7 @@ class AuthenticateUser(APIView):
     ]
 
     def get(self, request):
-        try:
-            Emails.objects.get(email=request.user.email)
-            verified = 'verified'
-        except:
-            verified = None
-        
-        try:
-            try:
-                BarberDetails.objects.get(id=request.user.id)
-                details = 'submitted'
-            except:
-                UserDetails.objects.get(id=request.user.id)
-                details = 'submitted'
-        except:
-            details = None
+        verified, details = check(request.user.email, request.user.username, request)
 
         return Response({
             'verified': verified,

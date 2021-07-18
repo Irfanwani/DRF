@@ -2,8 +2,8 @@ from rest_framework import generics, permissions, serializers, status
 from rest_framework.response import Response
 
 from knox.models import AuthToken
-from .serializers import RegistrationSerializer, UserSerializer, LoginSerializer
-from .models import Emails, PasswordCodes, SignUpCodes
+from .serializers import BarberDetailSerializer, RegistrationSerializer, UserDetailSerializer, UserSerializer, LoginSerializer
+from .models import BarberDetails, Emails, PasswordCodes, SignUpCodes, UserDetails
 
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
@@ -18,6 +18,27 @@ import string
 def verificationCode():
     specials = "@#$%^&*"
     return ''.join([random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits + specials) for n in range(random.randint(8, 12))])
+
+
+# email verificationand details check
+def check(email, user, request):
+    try:
+        Emails.objects.get(email=email)
+        verified = 'verified'
+    except:
+        verified = None
+
+    try:
+        try:
+            details = BarberDetailSerializer(BarberDetails.objects.get(
+                id=User.objects.get(username=user).id), context={'request': request}).data
+        except:
+            details = UserDetailSerializer(UserDetails.objects.get(
+                id=User.objects.get(username=user).id), context={'request': request}).data
+    except:
+        details = None
+
+    return verified, details
 
 
 # Registration
@@ -139,11 +160,7 @@ class LoginView(generics.GenericAPIView):
         user = serializer.validated_data
         email = User.objects.get(username=user).email
 
-        try:
-            Emails.objects.get(email=email)
-            verified = 'verified'
-        except:
-            verified = None
+        verified, details = check(email, user, request)
 
         _, token = AuthToken.objects.create(user)
 
@@ -153,7 +170,8 @@ class LoginView(generics.GenericAPIView):
         return Response({
             'user': UserSerializer(user, context=self.get_serializer_context()).data,
             'token': token,
-            'verified': verified
+            'verified': verified,
+            'details': details
         })
 
 
@@ -230,18 +248,14 @@ class PasswordReset(generics.GenericAPIView):
                 send_mail(subject='Password changed successfully!', message=f'Your password was updated successfully!',
                           from_email=getattr(settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f"{email}"], fail_silently=False)
 
-                try:
-                    Emails.objects.get(email=email)
-                    verified = 'verified'
-                except:
-                    verified = None
-
+                verified, details = check(email, user, request)
 
                 _, token = AuthToken.objects.create(user)
                 return Response({
                     'user': UserSerializer(user, context=self.get_serializer_context()).data,
                     'token': token,
-                    'verified': verified
+                    'verified': verified,
+                    'details': details
                 })
 
             return Response({
