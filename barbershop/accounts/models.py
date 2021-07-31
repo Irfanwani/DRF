@@ -1,10 +1,13 @@
 from django.contrib.gis.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 from django.core.exceptions import ValidationError
 
 # Create your models here.
 # Auth models
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True, blank=False, null=False)
 
 
 class Emails(models.Model):

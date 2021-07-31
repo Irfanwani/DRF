@@ -3,8 +3,7 @@ from django.http.request import QueryDict
 from rest_framework import permissions, generics, serializers, status
 from rest_framework.response import Response
 from django.core.mail import send_mail
-from accounts.models import BarberDetails
-from django.contrib.auth.models import User
+from accounts.models import User, BarberDetails
 
 from .models import Appointments
 from .serializers import AppointmentSerializer

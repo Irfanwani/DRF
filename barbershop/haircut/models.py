@@ -1,6 +1,5 @@
 from django.db import models
-from accounts.models import BarberDetails
-from django.contrib.auth.models import User
+from accounts.models import BarberDetails, User
 
 # Create your models here.
 class Appointments(models.Model):

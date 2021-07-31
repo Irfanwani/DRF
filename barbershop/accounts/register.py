@@ -3,10 +3,9 @@ from rest_framework.response import Response
 
 from knox.models import AuthToken
 from .serializers import BarberDetailSerializer, RegistrationSerializer, UserDetailSerializer, UserSerializer, LoginSerializer
-from .models import BarberDetails, Emails, PasswordCodes, SignUpCodes, UserDetails
+from .models import User, BarberDetails, Emails, PasswordCodes, SignUpCodes, UserDetails
 
 from django.core.mail import send_mail
-from django.contrib.auth.models import User
 
 from django.conf import settings
 

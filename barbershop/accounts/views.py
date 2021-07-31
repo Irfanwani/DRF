@@ -3,7 +3,7 @@ from django.http.request import QueryDict
 from rest_framework.views import APIView
 from rest_framework import generics, permissions, status
 
-from .models import BarberDetails, Emails, UserDetails
+from .models import User, BarberDetails, UserDetails
 from .serializers import UserDetailSerializer, BarberDetailSerializer
 from .register import check
 
@@ -12,8 +12,6 @@ from rest_framework.response import Response
 
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
-
-from django.contrib.auth.models import User
 
 from django.conf import settings
 from django.core.mail import send_mail

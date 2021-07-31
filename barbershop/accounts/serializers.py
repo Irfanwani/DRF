@@ -1,10 +1,7 @@
-from accounts.models import UserDetails, BarberDetails
+from accounts.models import User, UserDetails, BarberDetails
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from django.contrib.gis.geos import Point
 
-User._meta.get_field('email')._unique = True
 # user serialization
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
