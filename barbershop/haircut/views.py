@@ -21,9 +21,12 @@ class AppointmentView(generics.GenericAPIView):
     serializer_class = AppointmentSerializer
 
     def get(self, request):
-
-        serializer = self.get_serializer(
-            self.get_queryset().filter(Q(user=request.user) | Q(barber=BarberDetails.objects.get(id=request.user.id))), many=True)
+        try:
+            serializer = self.get_serializer(
+                self.get_queryset().filter(Q(user=request.user) | Q(barber=BarberDetails.objects.get(id=request.user.id))), many=True)
+        except:
+            serializer = self.get_serializer(
+                self.get_queryset().filter(user=request.user), many=True)
 
         # Converting datetime into human-readable string
         [app.update({'datetime': datetime.strptime(
