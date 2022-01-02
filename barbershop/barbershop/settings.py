@@ -27,7 +27,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.43.176', 'barbershopbackend.herokuapp.com']
+ALLOWED_HOSTS = ['barbershopbackend.herokuapp.com']
 
 
 if os.name == 'nt':

@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from .models import Appointments
+from .models import Appointments, NotificationTokens
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointments
+        fields = '__all__'
+
+class NotificationTokenSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationTokens
         fields = '__all__'
         
         

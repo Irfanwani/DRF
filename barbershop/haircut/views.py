@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from django.core.mail import send_mail
 from accounts.models import User, BarberDetails
 
-from .models import Appointments
-from .serializers import AppointmentSerializer
+from .models import Appointments, NotificationTokens
+from .serializers import AppointmentSerializer, NotificationTokenSerializer
 from datetime import datetime, timedelta
 from django.conf import settings
+
+from rest_framework.decorators import api_view, permission_classes
 
 
 # Create your views here.
@@ -117,8 +119,10 @@ class AppointmentView(generics.GenericAPIView):
         send_mail(subject='Appointment fixed successfully.', message='Appointment fixed successfully!', from_email=getattr(
             settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{request.user.email}', f'{barber.id.email}'])
 
+        token = NotificationTokens.objects.filter(user=barber.id).token
         return Response({
-            'message': "appointment fixed successfully!"
+            'message': "appointment fixed successfully!",
+            "token": token
         })
 
 
@@ -137,4 +141,11 @@ class CancelAppointment(generics.DestroyAPIView):
             'You cannot change other\'s appointment.')
 
 
-# Now it is time to integrate payment gateway
+class SaveToken(generics.CreateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    queryset = NotificationTokens.objects.all()
+
+    serializer_class = NotificationTokenSerializer
