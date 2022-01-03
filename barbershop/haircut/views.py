@@ -119,10 +119,16 @@ class AppointmentView(generics.GenericAPIView):
         send_mail(subject='Appointment fixed successfully.', message='Appointment fixed successfully!', from_email=getattr(
             settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{request.user.email}', f'{barber.id.email}'])
 
-        token = NotificationTokens.objects.filter(user=barber.id).token
+        try:
+            querylist = NotificationTokens.objects.filter(
+                user=User.objects.get(username=request.data['barber']))
+            tokenlist = [querylist[i].token for i in range(len(querylist))]
+        except:
+            tokenlist = None
+
         return Response({
             'message': "appointment fixed successfully!",
-            "token": token
+            "tokenlist": tokenlist
         })
 
 
@@ -149,3 +155,35 @@ class SaveToken(generics.CreateAPIView):
     queryset = NotificationTokens.objects.all()
 
     serializer_class = NotificationTokenSerializer
+
+    def perform_create(self, serializer):
+        queryList = NotificationTokens.objects.filter(
+            user=self.request.user, token=self.request.data['token'])
+        if queryList.exists():
+            return
+        serializer.save()
+
+
+class removeToken(generics.GenericAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def post(self, request):
+        try:
+            NotificationTokens.objects.get(
+                user=request.user, token=request.data['token']).delete()
+        except:
+            pass
+        return Response({
+            'msg': 'logout success'
+        })
+
+    def put(self, request):
+        try:
+            NotificationTokens.objects.filter(user=request.user).delete()
+        except:
+            pass
+        return Response({
+            'msg': 'logout success'
+        })

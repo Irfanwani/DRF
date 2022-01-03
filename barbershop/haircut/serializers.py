@@ -12,4 +12,3 @@ class NotificationTokenSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
         
-        
