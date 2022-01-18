@@ -49,7 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
     'django.contrib.staticfiles',
+    # 'cloudinary_storage',
+    # 'cloudinary',
+
     "django.contrib.gis",
     'django_cleanup',
 
@@ -177,6 +181,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': 'YOUR_CLOUD_NAME',
+#     'API_KEY': 'YOUR_API_KEY',
+#     'API_SECRET': 'YOUR_API_SECRET',
+# }
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

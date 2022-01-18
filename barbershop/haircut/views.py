@@ -13,6 +13,18 @@ from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 
 
+import random
+
+def getUniqueCode(query):
+  code = random.randint(10000000, 99999999)
+
+  if code not in query:
+    return code
+  getUniqueCode()
+
+
+
+
 # Create your views here.
 class AppointmentView(generics.GenericAPIView):
     queryset = Appointments.objects.all()
@@ -108,16 +120,25 @@ class AppointmentView(generics.GenericAPIView):
             pass
 
         # After this, only validation error can occur
+        queryList = Appointments.objects.filter(barber=barber)
+        query = [queryList[i].bookingID for i in range(len(queryList))]
+
+        code = getUniqueCode(query)
+
         request.data.update(
-            {'user': request.user.id, 'barber': barber.id, 'datetime': parsedDate})
+            {'user': request.user.id, 'barber': barber.id, 'datetime': parsedDate, 'bookingID': code})
 
         serializer = self.get_serializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        send_mail(subject='Appointment fixed successfully.', message='Appointment fixed successfully!', from_email=getattr(
-            settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{request.user.email}', f'{barber.id.email}'])
+
+
+        send_mail(subject='Appointment fixed successfully.', message=f'Appointment fixed successfully! Here is your booking ID: {code}', from_email=getattr(
+            settings, 'DEFAULT_FROM_EMAIL'), recipient_list=[f'{request.user.email}'])
+
+
 
         try:
             querylist = NotificationTokens.objects.filter(
