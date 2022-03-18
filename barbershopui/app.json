@@ -1,0 +1,23 @@
+{
+	"expo": {
+		"plugins": [
+			[
+				"expo-notifications",
+				{
+					"icon": "./assets/icon.png",
+					"color": "#ffffff"
+				}
+			]
+		],
+		"name": "barbershopui",
+		"slug": "barbershopui",
+		"version": "1.0.0",
+		"assetBundlePatterns": ["**/*"],
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		}
+	}
+}
