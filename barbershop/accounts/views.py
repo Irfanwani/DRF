@@ -84,30 +84,6 @@ class BarberDetailsView(generics.GenericAPIView):
     serializer_class = BarberDetailSerializer
     parser_classes = [MultiPartParser, FormParser]
 
-    def get(self, request):
-        # Checking if the user has provided address details
-        try:
-            try:
-                user = UserDetails.objects.get(id=request.user.id)
-            except:
-                user = BarberDetails.objects.get(id=request.user.id)
-
-            # sorting the barbers as per the distance from the logged in user
-            sortedQueryset = self.get_queryset().annotate(distance=Distance(
-                'coords', user.coords, spheroid=True)).order_by('distance')
-        except:
-            return Response({
-                'message': 'Please upload your address details to see barbers nearest to you.'
-            }, status.HTTP_403_FORBIDDEN)
-
-        # Passing the sorted barbers to the serializer and adding the distance to be returned with the Response
-        serializer = self.get_serializer(sortedQueryset, many=True)
-        [barber.update({'username': User.objects.get(id=barber['id']).username, 'Distance': [round(b.distance.km, 2)
-                       for b in sortedQueryset if b.id == User.objects.get(id=barber['id'])][0], 'start_time': datetime.strptime(barber['start_time'], "%H:%M:%S").strftime("%I:%M %p"), 'end_time': datetime.strptime(barber['end_time'], "%H:%M:%S").strftime("%I:%M %p")}) for barber in serializer.data]
-
-        details = serializer.data
-        return Response(details)
-
     def post(self, request, *args, **kwargs):
         if isinstance(request.data, QueryDict):
             request.data._mutable = True
@@ -208,9 +184,11 @@ class AuthenticateUser(APIView):
     ]
 
     def get(self, request):
-        verified, details = check(request.user.email, request.user.username, request)
+        verified, details, account_added, services_added = check(request.user.email, request.user.username, request)
 
         return Response({
             'verified': verified,
-            'details': details
+            'details': details,
+            'account_added': account_added,
+            'services_added': services_added
         })

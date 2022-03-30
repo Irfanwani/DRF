@@ -1,4 +1,4 @@
-from accounts.models import User, UserDetails, BarberDetails
+from accounts.models import BankDetails, ServicesDetails, User, UserDetails, BarberDetails
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 
@@ -73,6 +73,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 # Barber details serialization
 class BarberDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -114,3 +115,17 @@ class BarberDetailSerializer(serializers.ModelSerializer):
             pass
         instance.save()
         return instance
+
+
+# Bank details serailization
+class BankDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BankDetails
+        fields = '__all__'
+
+
+# add services serialization
+class ServicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ServicesDetails
+        fields = '__all__'

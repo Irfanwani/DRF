@@ -71,3 +71,51 @@ class BarberDetails(models.Model):
 
     def __str__(self):
         return f'Barber details for the user {self.id} added'
+
+
+
+BUSINESS_CHOICES = (
+    ('individual', 'individual'),
+    ('partnership', 'partnership'),
+    ('proprietorship', 'proprietorship'),
+    ('not_yet_registered', 'not_yet_registered')
+)
+
+ACCOUNT_CHOICES = (
+    ('savings', 'savings'),
+    ('current', 'current')
+)
+
+class BankDetails(models.Model):
+    id = models.OneToOneField(BarberDetails, on_delete=models.CASCADE, primary_key=True)
+    business_name = models.CharField(max_length=100, blank=False, null=False)
+    business_type = models.CharField(max_length=100, blank=False, null=False, choices=BUSINESS_CHOICES)
+
+    beneficiary_name = models.CharField(max_length=60, null=False, blank=False)
+    account_number = models.PositiveBigIntegerField(null=False, blank=False)
+    ifsc_code = models.CharField(max_length=20, blank=False, null=False)
+    account_type = models.CharField(max_length=60, blank=True, null=True, choices=ACCOUNT_CHOICES)
+
+    account_id = models.CharField(max_length=60, null=False, blank=False)
+    destination = models.CharField(max_length=60, null=False, blank=False)
+
+    def __str__(self):
+        return f'Account with account_id {self.account_id} and beneficiary name {self.beneficiary_name} created'
+
+
+SERVICE_CHOICES = (
+    ('barbershop', 'barbershop'),
+    ('hair_salon', 'hair_salon'),
+    ('beauty_salon', 'beauty_salon'),
+    ('full_service_salon', 'full_service_salon'),
+    ('other', 'other'),
+)
+
+class ServicesDetails(models.Model):
+    service_provider = models.ForeignKey(BarberDetails, on_delete=models.CASCADE)
+    service_type = models.CharField(max_length=60, blank=False, null=False, choices=SERVICE_CHOICES)
+    service = models.CharField(max_length=100, blank=False, null=False)
+    cost = models.PositiveIntegerField(blank=False, null=False)
+
+    def __str__(self):
+        return f"service '{self.service}' with cost {self.cost} added"
