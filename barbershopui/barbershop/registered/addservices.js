@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, memo } from "react";
 import { View, FlatList } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { Divider, Title, HelperText, Button, FAB } from "react-native-paper";
+import { Divider, Title, HelperText, Button } from "react-native-paper";
 
 import { useSelector, useDispatch } from "react-redux";
 import styles, { backgroundcolor, styles2 } from "../styles";
@@ -140,7 +140,7 @@ const AddServices = () => {
 
 export default memo(AddServices);
 
-const data = [
+export const data = [
 	"Haircuts and trims",
 	"Haircuts with clippers",
 	"Formal hairstyles",

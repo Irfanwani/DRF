@@ -42,6 +42,22 @@ const styles = StyleSheet.create({
 		right: 90,
 		bottom: 0,
 	},
+
+	fab2: {
+		position: "absolute",
+		right: 30,
+		bottom: 30,
+	},
+
+	fab3: {
+		backgroundColor: Colors.teal500,
+	},
+
+	badge: {
+		position: "absolute",
+		elevation: 8,
+	},
+
 	rbsheet: {
 		backgroundColor: "black",
 		borderTopEndRadius: 10,
@@ -322,7 +338,7 @@ const styles = StyleSheet.create({
 		color: Colors.grey400,
 	},
 
-	tstyle11: { color: Colors.grey500, alignSelf: "center" },
+	tstyle11: { color: Colors.grey500, alignSelf: "center", marginBottom: 30 },
 
 	view2: { flexDirection: "row", justifyContent: "flex-start" },
 
@@ -458,4 +474,6 @@ export const styles2 = StyleSheet.create({
 	filterstyles: {
 		margin: 3,
 	},
+
+	divider: { marginVertical: 5 }
 });

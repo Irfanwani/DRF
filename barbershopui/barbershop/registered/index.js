@@ -1,7 +1,7 @@
 import React from "react";
 import { FlatList, View, TextInput } from "react-native";
 import { connect } from "react-redux";
-import { IconButton, Text } from "react-native-paper";
+import { FAB, IconButton, Text, Badge } from "react-native-paper";
 import { barbers, tokenCheck } from "../redux/actions/actions";
 import { getAppointments } from "../redux/actions/actions2";
 import { GET_ERRORS } from "../redux/actions/types";
@@ -9,6 +9,10 @@ import { GET_ERRORS } from "../redux/actions/types";
 import { notification_manager } from "../notifications";
 
 import { Barber, HeaderComponent } from "../components/renderItem";
+
+import { MultiSelect } from "../components/multiselect";
+
+import { data as serviceList } from "./addservices";
 
 import styles, {
 	backgroundcolor,
@@ -21,6 +25,8 @@ class Index extends React.PureComponent {
 		searching: false,
 		query: "",
 		notification_token: "",
+		visible: false,
+		filterCount: 0,
 	};
 
 	setSearch = () => {
@@ -37,6 +43,11 @@ class Index extends React.PureComponent {
 
 	search = () => {
 		this.setState({ searching: true });
+	};
+
+	callback = (...rest) => {
+		this.setState(rest[0] ? { filterCount: rest[0] } : { filterCount: 0 });
+		this.setState({ visible: false });
 	};
 
 	componentDidMount() {
@@ -109,7 +120,7 @@ class Index extends React.PureComponent {
 
 	render() {
 		const { barberList, barbers, loading } = this.props;
-		const { query } = this.state;
+		const { query, visible, filterCount } = this.state;
 		const data = barberList?.filter(
 			(barber) =>
 				barber.username.toLowerCase().includes(query.toLowerCase()) ||
@@ -133,6 +144,21 @@ class Index extends React.PureComponent {
 							<Text style={styles.tstyle11}>End Reached!</Text>
 						)
 					}
+				/>
+
+				<View style={styles.fab2}>
+					<FAB
+						icon="filter-outline"
+						color="white"
+						style={styles.fab3}
+						onPress={() => this.setState({ visible: true })}
+					/>
+					<Badge style={styles.badge}>{filterCount}</Badge>
+				</View>
+				<MultiSelect
+					data={serviceList}
+					visible={visible}
+					callback={this.callback}
 				/>
 			</View>
 		);

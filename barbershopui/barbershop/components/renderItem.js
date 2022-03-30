@@ -12,7 +12,13 @@ import {
 	HelperText,
 	Title,
 	Button,
+	Colors,
 } from "react-native-paper";
+
+import { useDispatch, useSelector } from "react-redux";
+
+import { barbers } from "../redux/actions/actions";
+import { SELECTED_SERVICE_TYPE } from "../redux/actions/types";
 
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import styles, { backgroundcolor, styles2 } from "../styles";
@@ -140,23 +146,83 @@ export const Barber = memo((props) => {
 	);
 });
 
-// filtering component (incomplete)
+// filtering component
 export const HeaderComponent = memo((props) => {
+	const { selected } = useSelector((state) => ({
+		selected: state.filterReducer.service_type,
+	}));
+
+	const dispatch = useDispatch();
+
+	const isFirstRender = useRef(true);
+
+	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return;
+		}
+		dispatch(barbers(selected));
+	}, [selected]);
+
+	const select = (type) => {
+		if (selected !== type) {
+			dispatch({
+				type: SELECTED_SERVICE_TYPE,
+				payload: type,
+			});
+		} else {
+			dispatch({
+				type: SELECTED_SERVICE_TYPE,
+				payload: null,
+			});
+		}
+	};
+
 	return (
 		<ScrollView horizontal>
-			<Button icon="content-cut" mode='outlined' style={styles2.filterstyles}>
+			<Button
+				icon="content-cut"
+				color={Colors.teal500}
+				mode={selected == "barbershop" ? "contained" : "outlined"}
+				style={styles2.filterstyles}
+				onPress={() => select("barbershop")}
+			>
 				Barbershops
 			</Button>
-			<Button icon="hair-dryer-outline" mode='outlined' style={styles2.filterstyles}>
+			<Button
+				icon="hair-dryer-outline"
+				color={Colors.teal500}
+				mode={selected == "hair_salon" ? "contained" : "outlined"}
+				style={styles2.filterstyles}
+				onPress={() => select("hair_salon")}
+			>
 				Hair Salons
 			</Button>
-			<Button icon="chair-rolling" mode='outlined' style={styles2.filterstyles}>
+			<Button
+				icon="chair-rolling"
+				color={Colors.teal500}
+				mode={selected == "beauty_salon" ? "contained" : "outlined"}
+				style={styles2.filterstyles}
+				onPress={() => select("beauty_salon")}
+			>
 				Beauty Salons
 			</Button>
-			<Button icon="store" mode='outlined' style={styles2.filterstyles}>
+			<Button
+				icon="store"
+				color={Colors.teal500}
+				mode={selected == "full_service_salon" ? "contained" : "outlined"}
+				style={styles2.filterstyles}
+				onPress={() => select("full_service_salon")}
+			>
 				Full-Service Salons
 			</Button>
-			<Button icon="magnify" mode='outlined' style={styles2.filterstyles}>
+			<Button
+				icon="magnify"
+				color={Colors.teal500}
+				mode={selected == "other" ? "contained" : "outlined"}
+				style={styles2.filterstyles}
+				onPress={() => select("other")}
+			>
 				Others
 			</Button>
 		</ScrollView>

@@ -122,7 +122,7 @@ const DrawerScreens = (props) => {
 				headerTintColor: headertextcolor,
 			}}
 			drawerContent={(props) => <CustomDrawer {...props} />}
-			
+			useLegacyImplementation={true}
 		>
 			<Drawer.Screen
 				options={{

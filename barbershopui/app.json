@@ -9,7 +9,7 @@
 				}
 			]
 		],
-		"name": "barbershopui",
+		"name": "Barbershop",
 		"slug": "barbershopui",
 		"version": "1.0.0",
 		"assetBundlePatterns": ["**/*"],

@@ -409,15 +409,24 @@ export const details = (image, profile, userType) => (dispatch, getState) => {
 };
 
 // get barbers
-export const barbers = () => (dispatch, getState) => {
+export const barbers = (selected, services) => (dispatch, getState) => {
 	dispatch({
 		type: actions.LOADING,
 	});
 
 	const config = setConfig(getState);
+	let body = null;
+
+	if (selected) {
+		body = JSON.stringify({ service_type: selected });
+	} else if (services?.length > 0) {
+		body = JSON.stringify({ services });
+	} else {
+		dispatch({ type: actions.REMOVE_FILTERS });
+	}
 
 	axios
-		.get(BASE_URL + "/barberdetails", config)
+		.post(BASE_URL + "/filterbarbers", body, config)
 		.then((res) => {
 			dispatch({
 				type: actions.GET_BARBERS,
