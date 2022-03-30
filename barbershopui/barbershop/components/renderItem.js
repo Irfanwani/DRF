@@ -15,10 +15,9 @@ import {
 	Colors,
 } from "react-native-paper";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { barbers } from "../redux/actions/actions";
-import { SELECTED_SERVICE_TYPE } from "../redux/actions/types";
 
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import styles, { backgroundcolor, styles2 } from "../styles";
@@ -148,33 +147,38 @@ export const Barber = memo((props) => {
 
 // filtering component
 export const HeaderComponent = memo((props) => {
-	const { selected } = useSelector((state) => ({
-		selected: state.filterReducer.service_type,
-	}));
+	const { removeFilters, callback } = props;
+
+	const [selected, setSelected] = useState(null);
 
 	const dispatch = useDispatch();
 
 	const isFirstRender = useRef(true);
 
 	useEffect(() => {
+		if (removeFilters) {
+			setSelected(null);
+			return;
+		}
+	}, [removeFilters]);
+
+	useEffect(() => {
 		if (isFirstRender.current) {
 			isFirstRender.current = false;
 			return;
 		}
-		dispatch(barbers(selected));
+
+		if (!removeFilters) {
+			dispatch(barbers(selected));
+		}
 	}, [selected]);
 
 	const select = (type) => {
+		callback(false);
 		if (selected !== type) {
-			dispatch({
-				type: SELECTED_SERVICE_TYPE,
-				payload: type,
-			});
+			setSelected(type);
 		} else {
-			dispatch({
-				type: SELECTED_SERVICE_TYPE,
-				payload: null,
-			});
+			setSelected(null);
 		}
 	};
 

@@ -422,7 +422,7 @@ export const barbers = (selected, services) => (dispatch, getState) => {
 	} else if (services?.length > 0) {
 		body = JSON.stringify({ services });
 	} else {
-		dispatch({ type: actions.REMOVE_FILTERS });
+		body = null;
 	}
 
 	axios

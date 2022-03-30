@@ -12,13 +12,12 @@ import {
 } from "react-native-paper";
 import { backgroundcolor, styles2 } from "../styles";
 import { useTheme } from "react-native-paper";
-import { useDispatch, useSelector } from "react-redux";
-import { SELECTED_SERVICES } from "../redux/actions/types";
+import { useDispatch } from "react-redux";
 import { barbers } from "../redux/actions/actions";
 
 export const MultiSelect = (props) => {
-	const { data, visible, callback } = props;
-
+	const { data, visible, callback, hitserver, clearSelection, callback2 } =
+		props;
 
 	const [selectedItems, setSelectedItems] = useState([]);
 
@@ -31,14 +30,22 @@ export const MultiSelect = (props) => {
 	const isFirstRender = useRef(true);
 
 	useEffect(() => {
+		if (clearSelection) {
+			setSelectedItems([]);
+		}
+	}, [clearSelection]);
+
+	useEffect(() => {
 		if (isFirstRender.current) {
 			isFirstRender.current = false;
 			return;
 		}
 		callback(selectedItems.length);
-		
 
-		dispatch(barbers(null, selectedItems));
+		if (selectedItems.length > 0) {
+			console.log(selectedItems);
+			dispatch(barbers(null, selectedItems));
+		}
 	}, [selectedItems]);
 
 	const renderItem = ({ item, index }) => {
@@ -59,8 +66,7 @@ export const MultiSelect = (props) => {
 	};
 
 	const applyFilter = () => {
-		dispatch({type: SELECTED_SERVICES})
-
+		callback2(false);
 		ref.current.map((el, index) => {
 			if (el.state.checked) {
 				if (!selectedItems.includes(data[index])) {

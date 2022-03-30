@@ -27,6 +27,8 @@ class Index extends React.PureComponent {
 		notification_token: "",
 		visible: false,
 		filterCount: 0,
+		clearSelection: false,
+		removeFilters: false,
 	};
 
 	setSearch = () => {
@@ -48,6 +50,14 @@ class Index extends React.PureComponent {
 	callback = (...rest) => {
 		this.setState(rest[0] ? { filterCount: rest[0] } : { filterCount: 0 });
 		this.setState({ visible: false });
+	};
+
+	callback2 = (cl) => {
+		this.setState({ clearSelection: cl, removeFilters: true });
+	};
+
+	cbfun = (val) => {
+		this.setState({ removeFilters: val, clearSelection: true });
 	};
 
 	componentDidMount() {
@@ -120,7 +130,8 @@ class Index extends React.PureComponent {
 
 	render() {
 		const { barberList, barbers, loading } = this.props;
-		const { query, visible, filterCount } = this.state;
+		const { query, visible, filterCount, clearSelection, removeFilters } =
+			this.state;
 		const data = barberList?.filter(
 			(barber) =>
 				barber.username.toLowerCase().includes(query.toLowerCase()) ||
@@ -131,14 +142,22 @@ class Index extends React.PureComponent {
 				<FlatList
 					style={styles.vstyle6}
 					refreshing={loading ? loading : false}
-					onRefresh={barbers}
+					onRefresh={() => {
+						barbers();
+						this.setState({ removeFilters: true, clearSelection: true });
+					}}
 					data={data}
 					renderItem={this.renderItem}
 					keyExtractor={(item) => item.id.toString()}
 					ListEmptyComponent={
 						<Text style={styles.tstyle10}>No barber found!</Text>
 					}
-					ListHeaderComponent={<HeaderComponent />}
+					ListHeaderComponent={
+						<HeaderComponent
+							removeFilters={removeFilters}
+							callback={this.cbfun}
+						/>
+					}
 					ListFooterComponent={
 						data?.length != 0 && (
 							<Text style={styles.tstyle11}>End Reached!</Text>
@@ -159,6 +178,8 @@ class Index extends React.PureComponent {
 					data={serviceList}
 					visible={visible}
 					callback={this.callback}
+					clearSelection={clearSelection}
+					callback2={this.callback2}
 				/>
 			</View>
 		);
