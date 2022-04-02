@@ -60,6 +60,11 @@ class Index extends React.PureComponent {
 		this.setState({ removeFilters: val, clearSelection: true });
 	};
 
+	refresh = () => {
+		this.props.barbers();
+		this.setState({ removeFilters: true, clearSelection: true });
+	};
+
 	componentDidMount() {
 		this.props.navigation.setOptions({
 			headerTitle: "Barbershop",
@@ -129,7 +134,7 @@ class Index extends React.PureComponent {
 	);
 
 	render() {
-		const { barberList, barbers, loading } = this.props;
+		const { barberList, loading } = this.props;
 		const { query, visible, filterCount, clearSelection, removeFilters } =
 			this.state;
 		const data = barberList?.filter(
@@ -142,10 +147,7 @@ class Index extends React.PureComponent {
 				<FlatList
 					style={styles.vstyle6}
 					refreshing={loading ? loading : false}
-					onRefresh={() => {
-						barbers();
-						this.setState({ removeFilters: true, clearSelection: true });
-					}}
+					onRefresh={this.refresh}
 					data={data}
 					renderItem={this.renderItem}
 					keyExtractor={(item) => item.id.toString()}
@@ -180,6 +182,7 @@ class Index extends React.PureComponent {
 					callback={this.callback}
 					clearSelection={clearSelection}
 					callback2={this.callback2}
+					barbersFilter={true}
 				/>
 			</View>
 		);

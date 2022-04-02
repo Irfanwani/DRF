@@ -33,6 +33,8 @@ import {
 
 import openMap from "react-native-open-maps";
 
+import { MultiSelect } from "../components/multiselect";
+
 import * as Animatable from "react-native-animatable";
 
 import styles from "../styles";

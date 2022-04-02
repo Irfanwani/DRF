@@ -16,7 +16,7 @@ import { useDispatch } from "react-redux";
 import { barbers } from "../redux/actions/actions";
 
 export const MultiSelect = (props) => {
-	const { data, visible, callback, hitserver, clearSelection, callback2 } =
+	const { data, visible, callback, clearSelection, callback2, barbersFilter } =
 		props;
 
 	const [selectedItems, setSelectedItems] = useState([]);
@@ -42,8 +42,7 @@ export const MultiSelect = (props) => {
 		}
 		callback(selectedItems.length);
 
-		if (selectedItems.length > 0) {
-			console.log(selectedItems);
+		if (selectedItems.length > 0 && barbersFilter) {
 			dispatch(barbers(null, selectedItems));
 		}
 	}, [selectedItems]);
@@ -80,6 +79,12 @@ export const MultiSelect = (props) => {
 
 	const itemSepComp = () => <Divider style={styles2.divider} />;
 
+	const clearFilter = () => {
+		callback2(true);
+		setSelectedItems([]);
+		dispatch(barbers());
+	};
+
 	return (
 		<Portal>
 			<Modal
@@ -94,7 +99,7 @@ export const MultiSelect = (props) => {
 				<Button
 					color={Colors.blue500}
 					style={{ alignSelf: "flex-end" }}
-					onPress={() => setSelectedItems([])}
+					onPress={clearFilter}
 				>
 					Clear Filters
 				</Button>
