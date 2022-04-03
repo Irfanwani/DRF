@@ -103,9 +103,8 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 		.then((res) => {
 			let result = [];
 			res.data.forEach((item) => {
-				let itm = `${item.service}		Rs. ${item.cost}`;
+				let itm = `${item.service}		Rs.${item.cost}`;
 				result.push(itm);
-				console.log(result)
 				dispatch({
 					type: GET_SERVICES,
 					payload: result,
@@ -114,7 +113,6 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 			});
 		})
 		.catch((err) => {
-			console.log(err.response.data)
 			let check = tokenCheck(err, FIX_FAIL);
 			dispatch(check);
 		});

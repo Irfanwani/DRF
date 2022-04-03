@@ -184,6 +184,7 @@ class Index extends React.PureComponent {
 					clearSelection={clearSelection}
 					callback2={this.callback2}
 					barbersFilter={true}
+					buttonLabel='Apply Filter'
 				/>
 			</View>
 		);

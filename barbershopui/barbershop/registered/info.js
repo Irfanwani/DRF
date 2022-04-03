@@ -50,6 +50,8 @@ class Info extends React.PureComponent {
 		modalVisible: false,
 		mapType: "standard",
 		msvisible: false,
+		services: null,
+		totalcost: 0,
 	};
 
 	setDateTime = (event, datetime) => {
@@ -106,9 +108,38 @@ class Info extends React.PureComponent {
 		</View>
 	);
 
+	callback = () => {
+		this.setState({ msvisible: false });
+	};
+
+	callback2 = () => {
+		this.Fix.open();
+	};
+
+	callback3 = (selectedServices) => {
+		let ss = [];
+		let total = 0;
+		selectedServices.forEach((item) => {
+			let items = item.split("Rs.");
+			total += parseInt(items[1]);
+
+			ss.push(items[0].trim());
+		});
+		this.setState({ services: ss.join("|"), totalcost: total });
+	};
+
 	render() {
-		const { date, time, showDTPicker, mode, modalVisible, mapType, msvisible } =
-			this.state;
+		const {
+			date,
+			time,
+			showDTPicker,
+			mode,
+			modalVisible,
+			mapType,
+			msvisible,
+			services,
+			totalcost,
+		} = this.state;
 		const {
 			id,
 			image,
@@ -192,15 +223,18 @@ class Info extends React.PureComponent {
 						getServices(id, () => {
 							this.setState({ msvisible: true });
 						});
-						// this.Fix.open()
 					}}
 				/>
 
 				<MultiSelect
 					title="Select Services"
+					subtitle='You can select atmost 3 services'
 					data={msdata}
 					visible={msvisible}
-					callback={() => this.setState({ msvisible: false })}
+					callback={this.callback}
+					callback2={this.callback2}
+					callback3={this.callback3}
+					buttonLabel="Proceed"
 				/>
 
 				<Portal>
@@ -282,6 +316,7 @@ class Info extends React.PureComponent {
 
 						{showDTPicker && (
 							<DateTimePicker
+								minuteInterval={20}
 								mode={mode}
 								display="default"
 								value={new Date()}
@@ -289,7 +324,14 @@ class Info extends React.PureComponent {
 							/>
 						)}
 
-						<Text style={styles.error}>{error ? error.message : ""}</Text>
+						<Text style={styles.error}>
+							{error
+								? error.message ||
+								  (error.services
+										? "Please select some services to proceed"
+										: "")
+								: ""}
+						</Text>
 
 						<View style={styles.view5}>
 							<Button
@@ -306,6 +348,8 @@ class Info extends React.PureComponent {
 										reg_username,
 										barber,
 										datetime,
+										services,
+										totalcost,
 										seeAppointments: this.seeAppointments,
 									})
 								}
@@ -318,6 +362,9 @@ class Info extends React.PureComponent {
 								Done
 							</Button>
 						</View>
+						<HelperText>
+							NOTE: Time can only be selected in intervals of 20 minutes
+						</HelperText>
 						<Text>
 							{error ? (
 								error.takendates ? (

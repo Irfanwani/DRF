@@ -112,8 +112,12 @@ const Appointments = () => {
 			<Surface style={styles.sustyle}>
 				<Title>{item.user == username ? item.barber : item.user}</Title>
 				<HelperText>{item.datetime}</HelperText>
+				<Text>Services Selected</Text>
+				{item.services.split("|").map((service) => (
+					<HelperText>{service}</HelperText>
+				))}
 				<View style={styles.vstyle11}>
-					<Title style={styles.tistyle}>₹923</Title>
+					<Title style={styles.tistyle}>₹{item.totalcost}</Title>
 					<Button
 						onPress={() =>
 							showMessage({

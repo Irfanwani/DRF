@@ -5,6 +5,7 @@ import {
 	Button,
 	Colors,
 	Divider,
+	HelperText,
 	Modal,
 	Portal,
 	Text,
@@ -18,12 +19,15 @@ import { barbers } from "../redux/actions/actions";
 export const MultiSelect = (props) => {
 	const {
 		title,
+		subtitle,
 		data,
 		visible,
 		callback,
-		clearSelection,
 		callback2,
+		callback3,
+		clearSelection,
 		barbersFilter,
+		buttonLabel,
 	} = props;
 
 	const [selectedItems, setSelectedItems] = useState([]);
@@ -48,6 +52,10 @@ export const MultiSelect = (props) => {
 			return;
 		}
 		callback(selectedItems.length);
+
+		if (callback3) {
+			callback3(selectedItems);
+		}
 
 		if (selectedItems.length > 0 && barbersFilter) {
 			dispatch(barbers(null, selectedItems));
@@ -103,14 +111,16 @@ export const MultiSelect = (props) => {
 				}}
 			>
 				<Title>{title}</Title>
-
-				<Button
-					color={Colors.blue500}
-					style={{ alignSelf: "flex-end" }}
-					onPress={clearFilter}
-				>
-					Clear Filters
-				</Button>
+				{subtitle && <HelperText>{subtitle}</HelperText>}
+				{barbersFilter && (
+					<Button
+						color={Colors.blue500}
+						style={{ alignSelf: "flex-end" }}
+						onPress={clearFilter}
+					>
+						Clear Filters
+					</Button>
+				)}
 
 				<FlatList
 					data={data}
@@ -126,7 +136,7 @@ export const MultiSelect = (props) => {
 					icon="check"
 					color={Colors.teal500}
 				>
-					Apply Filter
+					{buttonLabel}
 				</Button>
 			</Modal>
 		</Portal>

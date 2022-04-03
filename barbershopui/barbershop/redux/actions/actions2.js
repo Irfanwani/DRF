@@ -9,7 +9,7 @@ export const BASE_URL = "https://barbershopbackend.herokuapp.com/api/haircut";
 
 // fixing appointments
 export const fixAppointment =
-	({ reg_username, barber, datetime, seeAppointments }) =>
+	({ reg_username, barber, datetime, services, totalcost, seeAppointments }) =>
 	(dispatch, getState) => {
 		dispatch({
 			type: actions.LOADING,
@@ -26,7 +26,7 @@ export const fixAppointment =
 			.slice(0, 2)
 			.join(":");
 
-		const body = JSON.stringify({ barber, currentdatetime, datetime });
+		const body = JSON.stringify({ barber, currentdatetime, datetime, services, totalcost });
 		axios
 			.post(BASE_URL + "/appointments", body, config)
 			.then((res) => {
@@ -76,6 +76,7 @@ export const fixAppointment =
 				})();
 			})
 			.catch((err) => {
+				console.log(err.response.data)
 				let check = tokenCheck(err, actions.FIX_FAIL);
 				dispatch(check);
 			});
