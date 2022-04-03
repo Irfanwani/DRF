@@ -7,6 +7,8 @@ class Appointments(models.Model):
     barber = models.ForeignKey(BarberDetails, on_delete=models.CASCADE)
     datetime = models.DateTimeField()
     bookingID = models.PositiveIntegerField()
+    services = models.CharField(max_length=1000, blank=False, null=False)
+    totalcost = models.PositiveIntegerField()
 
     def __str__(self):
         return f'{self.user} fixed an appointment with {self.barber} on {self.datetime}'

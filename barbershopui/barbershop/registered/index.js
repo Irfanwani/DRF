@@ -177,6 +177,7 @@ class Index extends React.PureComponent {
 					<Badge style={styles.badge}>{filterCount}</Badge>
 				</View>
 				<MultiSelect
+					title='Filter As per Services provided'
 					data={serviceList}
 					visible={visible}
 					callback={this.callback}

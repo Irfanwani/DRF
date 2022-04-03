@@ -10,9 +10,6 @@ from .serializers import AppointmentSerializer, NotificationTokenSerializer
 from datetime import datetime, timedelta
 from django.conf import settings
 
-from rest_framework.decorators import api_view, permission_classes
-
-
 import random
 
 def getUniqueCode(query):
@@ -67,6 +64,18 @@ class AppointmentView(generics.GenericAPIView):
                 'message': 'This barber has no saved details. Please check again.'
             }, status.HTTP_404_NOT_FOUND)
 
+        # Check if 3 or less services are selected
+        try:
+            services = request.data['services'].split('|')
+            if len(services) > 3:
+                return Response({
+                    'error': "You cannot select more than 3 services."
+                }, status.HTTP_406_NOT_ACCEPTABLE)
+        except:
+            return Response({
+                'error': "Please select some services."
+            }, status.HTTP_406_NOT_ACCEPTABLE)
+
         # check if a valid datetime format and in proper range was given
         try:
             dt = request.data['datetime']
@@ -106,12 +115,12 @@ class AppointmentView(generics.GenericAPIView):
                     'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
                 }, status.HTTP_406_NOT_ACCEPTABLE)
 
-            fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=15) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime(
-                "%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p")) or (parsedDate + timedelta(minutes=15) > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p"))]
+            fixedAppointments = [apnt.datetime for apnt in apnts if (parsedDate - timedelta(minutes=(20 * len(apnt.services.split('|')))) < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate > datetime.strptime(apnt.datetime.strftime(
+                "%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p")) or (parsedDate + timedelta(minutes=(20 * len(apnt.services.split('|')))) > datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p") and parsedDate < datetime.strptime(apnt.datetime.strftime("%d/%m/%Y %I:%M %p"), "%d/%m/%Y %I:%M %p"))]
 
             if len(fixedAppointments) > 0:
                 return Response({
-                    'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 15 minutes.',
+                    'message': 'This time cannot be selected as nearby spots are already taken. Please try increasing your time by multiples of 20 minutes.',
                     'takendates': [apnt.datetime.strftime("%A, %b %d, %Y %I:%M %p") for apnt in apnts]
 
                 }, status.HTTP_406_NOT_ACCEPTABLE)

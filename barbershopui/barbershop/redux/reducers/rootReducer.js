@@ -9,6 +9,7 @@ import appointmentReducer from "./appointmentReducer";
 import themeReducer from "./themeReducer";
 import newuserReducer from "./newuserReducer";
 import compeletionReducer from './compeletionReducer'
+import getservicesReducer from "./getservicesReducer";
 
 export default combineReducers({
 	authReducer,
@@ -20,4 +21,5 @@ export default combineReducers({
 	themeReducer,
 	newuserReducer,
 	compeletionReducer,
+	getservicesReducer
 });

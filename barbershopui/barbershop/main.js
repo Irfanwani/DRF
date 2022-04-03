@@ -8,6 +8,8 @@ import {
 	IconButton,
 	Text,
 	Badge,
+	Portal,
+	Modal,
 } from "react-native-paper";
 
 import { Provider } from "react-redux";
@@ -201,13 +203,13 @@ const UnRegisteredStack = () => {
 
 	return (
 		<PaperProvider theme={darkmode ? CustomDarkTheme : CustomDefaultTheme}>
-			<ProgressBar
-				style={{
-					backgroundColor: darkmode ? darkbackgroundcolor : backgroundcolor,
-				}}
-				indeterminate={loading}
-				color="cyan"
-			/>
+			
+				<Portal>
+					<Modal visible={loading} dismissable={false}>
+						<ActivityIndicator color='orange' size='large' />
+					</Modal>
+				</Portal>
+			
 			<NavigationContainer
 				theme={darkmode ? CustomDarkTheme : CustomDefaultTheme}
 			>

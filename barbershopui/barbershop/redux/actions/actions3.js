@@ -1,4 +1,13 @@
-import { BANK_SUCCESS, COMPELETION_FAIL, LOADING, BANK_FAIL, COMPELETION_SUCCESS, GET_ERRORS } from "./types";
+import {
+	BANK_SUCCESS,
+	COMPELETION_FAIL,
+	LOADING,
+	BANK_FAIL,
+	COMPELETION_SUCCESS,
+	GET_ERRORS,
+	FIX_FAIL,
+	GET_SERVICES,
+} from "./types";
 
 import axios from "axios";
 import { setConfig, tokenCheck } from "./actions";
@@ -35,45 +44,78 @@ export const addBankDetails = (data) => (dispatch, getState) => {
 		});
 };
 
-export const addServicesList = ({service_type, services}) => (dispatch, getState) => {
+export const addServicesList =
+	({ service_type, services }) =>
+	(dispatch, getState) => {
+		dispatch({
+			type: LOADING,
+		});
+
+		const config = setConfig(getState);
+
+		const services_list = Object.values(services);
+
+		if (services_list.length == 0) {
+			showMessage({
+				message:
+					"Please select at least one service and also provide the price",
+				type: "default",
+				icon: "info",
+				position: "bottom",
+				style: styles2.flashstyle2,
+			});
+			dispatch({ type: GET_ERRORS });
+			return;
+		}
+
+		const body = JSON.stringify({
+			service_type: service_type,
+			services_list,
+		});
+
+		axios
+			.post(BASE_URL + "/addservices", body, config)
+			.then(() => {
+				dispatch({
+					type: COMPELETION_SUCCESS,
+				});
+				showMessage({
+					message: "Account Registration Completed!!",
+					type: "success",
+					icon: "success",
+				});
+			})
+			.catch((err) => {
+				let check = tokenCheck(err, COMPELETION_FAIL);
+				dispatch(check);
+			});
+	};
+
+export const getServices = (id, callback) => (dispatch, getState) => {
 	dispatch({
 		type: LOADING,
 	});
-
 	const config = setConfig(getState);
 
-	const services_list = Object.values(services);
 
-	if(services_list.length == 0) {
-		showMessage({
-			message: "Please select at least one service and also provide the price",
-			type: "default",
-			icon: "info",
-			position: "bottom",
-			style: styles2.flashstyle2,
+	axios
+		.get(BASE_URL + `/addservices?id=${id}`, config)
+		.then((res) => {
+			let result = [];
+			res.data.forEach((item) => {
+				let itm = `${item.service}		Rs. ${item.cost}`;
+				result.push(itm);
+				console.log(result)
+				dispatch({
+					type: GET_SERVICES,
+					payload: result,
+				});
+				callback();
+			});
+		})
+		.catch((err) => {
+			console.log(err.response.data)
+			let check = tokenCheck(err, FIX_FAIL);
+			dispatch(check);
 		});
-		dispatch({type: GET_ERRORS})
-		return;
-	}
-
-	const body = JSON.stringify({
-		service_type: service_type,
-		services_list,
-	});
-
-	axios.post(BASE_URL + "/addservices", body, config)
-    .then(() => {
-        dispatch({
-            type: COMPELETION_SUCCESS
-        })
-        showMessage({
-            message: 'Account Registration Completed!!',
-            type: 'success',
-            icon: 'success'
-        })
-    })
-    .catch((err) => {
-        let check = tokenCheck(err, COMPELETION_FAIL)
-        dispatch(check)
-    })
 };

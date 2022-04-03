@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from accounts.models import BarberDetails, ServicesDetails, UserDetails, User
-from accounts.serializers import BankDetailsSerializer, BarberDetailSerializer
+from accounts.serializers import BankDetailsSerializer, BarberDetailSerializer, ServicesSerializer
 
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Count
@@ -64,9 +64,26 @@ class BankView(generics.GenericAPIView):
 
 
 class ServicesView(generics.GenericAPIView):
+    serializer_class = ServicesSerializer
+    queryset = ServicesDetails.objects.all()
+
     permission_classes = [
         permissions.IsAuthenticated
     ]
+
+    def get(self, request):
+        try:
+            service_provider = request.query_params['id']
+
+            queries = self.get_queryset().filter(service_provider=service_provider).values('service', 'cost')
+
+            return Response(queries)
+        except:
+            return Response({
+                'error': "There is some error. Please try again"
+            }, status.HTTP_400_BAD_REQUEST)
+
+
 
     def post(self, request):
         try:

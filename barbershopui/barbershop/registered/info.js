@@ -31,6 +31,8 @@ import {
 	removeErrors,
 } from "../redux/actions/actions2";
 
+import { getServices } from "../redux/actions/actions3";
+
 import openMap from "react-native-open-maps";
 
 import { MultiSelect } from "../components/multiselect";
@@ -47,6 +49,7 @@ class Info extends React.PureComponent {
 		mode: "date",
 		modalVisible: false,
 		mapType: "standard",
+		msvisible: false,
 	};
 
 	setDateTime = (event, datetime) => {
@@ -104,9 +107,10 @@ class Info extends React.PureComponent {
 	);
 
 	render() {
-		const { date, time, showDTPicker, mode, modalVisible, mapType } =
+		const { date, time, showDTPicker, mode, modalVisible, mapType, msvisible } =
 			this.state;
 		const {
+			id,
 			image,
 			coords,
 			username,
@@ -117,8 +121,15 @@ class Info extends React.PureComponent {
 			contact,
 		} = this.props.route.params.props;
 
-		const { error, loading, fixAppointment, removeErrors, reg_username } =
-			this.props;
+		const {
+			error,
+			loading,
+			fixAppointment,
+			removeErrors,
+			reg_username,
+			getServices,
+			msdata,
+		} = this.props;
 
 		const datetime = `${date} ${time}`;
 		const barber = username;
@@ -177,7 +188,19 @@ class Info extends React.PureComponent {
 					icon="check"
 					style={styles.fstyle7}
 					label="fix appointment"
-					onPress={() => this.Fix.open()}
+					onPress={() => {
+						getServices(id, () => {
+							this.setState({ msvisible: true });
+						});
+						// this.Fix.open()
+					}}
+				/>
+
+				<MultiSelect
+					title="Select Services"
+					data={msdata}
+					visible={msvisible}
+					callback={() => this.setState({ msvisible: false })}
 				/>
 
 				<Portal>
@@ -326,12 +349,14 @@ const mapStateToProps = (state) => ({
 	error: state.errorReducer.error,
 	loading: state.errorReducer.loading,
 	reg_username: state.authReducer.user ? state.authReducer.user.username : null,
+	msdata: state.getservicesReducer.availableservices,
 });
 
 export default connect(mapStateToProps, {
 	fixAppointment,
 	getAppointments,
 	removeErrors,
+	getServices,
 })(Info);
 
 const MapLocation = (props) => {

@@ -16,8 +16,15 @@ import { useDispatch } from "react-redux";
 import { barbers } from "../redux/actions/actions";
 
 export const MultiSelect = (props) => {
-	const { data, visible, callback, clearSelection, callback2, barbersFilter } =
-		props;
+	const {
+		title,
+		data,
+		visible,
+		callback,
+		clearSelection,
+		callback2,
+		barbersFilter,
+	} = props;
 
 	const [selectedItems, setSelectedItems] = useState([]);
 
@@ -95,7 +102,8 @@ export const MultiSelect = (props) => {
 					backgroundColor: theme.colors.background,
 				}}
 			>
-				<Title>Filter As Per Services Provided</Title>
+				<Title>{title}</Title>
+
 				<Button
 					color={Colors.blue500}
 					style={{ alignSelf: "flex-end" }}
