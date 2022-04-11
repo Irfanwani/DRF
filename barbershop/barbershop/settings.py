@@ -60,9 +60,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'accounts',
-    'haircut'
+    'haircut',
+    'payments'
 
-    
+
 ]
 
 REST_FRAMEWORK = {
@@ -86,7 +87,6 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL')
 EMAIL_SUBJECT_PREFIX = 'BarberShop'
-
 
 
 MIDDLEWARE = [
@@ -200,4 +200,3 @@ RAZOR_URL = os.getenv('RAZOR_URL')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 django_heroku.settings(locals())
-

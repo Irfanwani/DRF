@@ -34,10 +34,10 @@ class AppointmentView(generics.GenericAPIView):
     def get(self, request):
         try:
             serializer = self.get_serializer(
-                self.get_queryset().filter(Q(user=request.user) | Q(barber=BarberDetails.objects.get(id=request.user.id))), many=True)
+                self.get_queryset().filter(Q(user=request.user) | Q(barber=BarberDetails.objects.get(id=request.user.id))).order_by('-paid'), many=True)
         except:
             serializer = self.get_serializer(
-                self.get_queryset().filter(user=request.user), many=True)
+                self.get_queryset().filter(user=request.user).order_by('-paid'), many=True)
 
         # Converting datetime into human-readable string
         [app.update({'datetime': datetime.strptime(

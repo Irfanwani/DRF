@@ -7,20 +7,20 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('api/accounts/', include('knox.urls')),
-    path('api/accounts/register', RegistrationView.as_view()),
-    path('api/accounts/login', LoginView.as_view()),
-    path('api/accounts/verifyemail', EmailView.as_view()),
-    path('api/accounts/passwordreset', PasswordReset.as_view()),
-    path('api/accounts/userdetails', UserDetailsView.as_view()),
-    path('api/accounts/barberdetails', BarberDetailsView.as_view()),
-    path('api/accounts/deleteuser/<int:pk>', DeleteUser.as_view()),
-    path('api/accounts/getbarber/<int:pk>', GetBarber.as_view()),
-    path('api/accounts/getuser/<int:pk>', GetUser.as_view()),
-    path('api/accounts/authenticateuser', AuthenticateUser.as_view()),
-    path('api/accounts/createbank', BankView.as_view()),
-    path('api/accounts/addservices', ServicesView.as_view()),
-    path('api/accounts/filterbarbers', BarberFilter.as_view()),
+    path('', include('knox.urls')),
+    path('register', RegistrationView.as_view()),
+    path('login', LoginView.as_view()),
+    path('verifyemail', EmailView.as_view()),
+    path('passwordreset', PasswordReset.as_view()),
+    path('userdetails', UserDetailsView.as_view()),
+    path('barberdetails', BarberDetailsView.as_view()),
+    path('deleteuser/<int:pk>', DeleteUser.as_view()),
+    path('getbarber/<int:pk>', GetBarber.as_view()),
+    path('getuser/<int:pk>', GetUser.as_view()),
+    path('authenticateuser', AuthenticateUser.as_view()),
+    path('createbank', BankView.as_view()),
+    path('addservices', ServicesView.as_view()),
+    path('filterbarbers', BarberFilter.as_view()),
     
 ]
 
