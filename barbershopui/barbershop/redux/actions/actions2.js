@@ -85,7 +85,7 @@ export const fixAppointment =
 // Getting appointments
 export const getAppointments = () => (dispatch, getState) => {
 	dispatch({
-		type: actions.LOADING,
+		type: actions.FETCHING,
 	});
 	const config = setConfig(getState);
 

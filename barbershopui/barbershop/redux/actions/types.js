@@ -25,6 +25,8 @@ export const GET_APPOINTMENTS = "GET_APPOINTMENTS";
 export const GET_APPOINTMENTS_FAIL = "GET_APPOINTMENTS_FAIL";
 
 export const LOADING = "LOADING";
+export const FETCHING = "FETCHING";
+
 export const CHANGE_THEME = "CHANGE_THEME";
 export const NEW_USER = "NEW_USER";
 

@@ -6,8 +6,6 @@ import {
 	Divider,
 	Card,
 	IconButton,
-	Dialog,
-	Paragraph,
 	Button,
 	Title,
 	HelperText,
@@ -17,17 +15,21 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { getAppointments, removeAppointment } from "../redux/actions/actions2";
 
-import { showMessage } from "react-native-flash-message";
 import styles, { styles2 } from "../styles";
 
 import AlertPro from "react-native-alert-pro";
 
+import { checkout } from "../redux/actions/actions4";
+
 const Appointments = () => {
-	const { appointments, username, loading } = useSelector((state) => ({
-		appointments: state.appointmentReducer.appointments,
-		username: state.authReducer.user?.username,
-		loading: state.errorReducer.loading,
-	}));
+	const { appointments, username, fetching, email, token } = useSelector(
+		(state) => ({
+			appointments: state.appointmentReducer.appointments,
+			username: state.authReducer.user?.username,
+			email: state.authReducer.user?.email,
+			fetching: state.errorReducer.fetching,
+		})
+	);
 
 	const dispatch = useDispatch();
 	const alertprocomp = useRef([]);
@@ -113,24 +115,32 @@ const Appointments = () => {
 				<Title>{item.user == username ? item.barber : item.user}</Title>
 				<HelperText>{item.datetime}</HelperText>
 				<Text>Services Selected</Text>
-				{item.services.split("|").map((service) => (
-					<HelperText>{service}</HelperText>
+				{item.services.split("|").map((service, index) => (
+					<HelperText key={index}>{service}</HelperText>
 				))}
 				<View style={styles.vstyle11}>
 					<Title style={styles.tistyle}>₹{item.totalcost}</Title>
-					<Button
-						onPress={() =>
-							showMessage({
-								message:
-									"Payment gateway pending. Will be added in future updates.",
-								type: "info",
-								icon: "info",
-								duration: 2000,
-							})
-						}
-					>
-						PAY
-					</Button>
+					{item.user == username &&
+						(!item.paid ? (
+							<Button
+								onPress={() => {
+									dispatch(
+										checkout({
+											amount: item.totalcost,
+											currency: "INR",
+											email: email,
+											apnt_id: item.id
+										})
+									);
+								}}
+								mode="contained"
+								color="teal"
+							>
+								PAY
+							</Button>
+						) : (
+							<Button color='grey' icon='check' compact>PAID</Button>
+						))}
 				</View>
 				<View style={styles.vstyle12}>
 					<Divider />
@@ -206,7 +216,7 @@ const Appointments = () => {
 				renderItem={renderAppointment}
 				ListEmptyComponent={ListEmptyComponent}
 				keyExtractor={(item) => item.id.toString()}
-				refreshing={loading ? loading : false}
+				refreshing={fetching}
 				onRefresh={refreshPage}
 				renderSectionHeader={({ section }) =>
 					section.data.length > 0 ? renderSectionHeader(section) : null

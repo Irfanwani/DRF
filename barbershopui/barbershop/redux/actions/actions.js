@@ -411,7 +411,7 @@ export const details = (image, profile, userType) => (dispatch, getState) => {
 // get barbers
 export const barbers = (selected, services) => (dispatch, getState) => {
 	dispatch({
-		type: actions.LOADING,
+		type: actions.FETCHING,
 	});
 
 	const config = setConfig(getState);

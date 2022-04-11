@@ -23,6 +23,8 @@ import java.util.List;
 
 import com.airbnb.android.react.maps.MapsPackage;
 
+import com.razorpay.rn.RazorpayPackage;
+
 public class MainApplication extends Application implements ReactApplication {
   private final ReactNativeHost mReactNativeHost = new ReactNativeHostWrapper(
     this,
@@ -37,7 +39,7 @@ public class MainApplication extends Application implements ReactApplication {
       @SuppressWarnings("UnnecessaryLocalVariable")
       List<ReactPackage> packages = new PackageList(this).getPackages();
       // Packages that cannot be autolinked yet can be added manually here, for example:
-      // packages.add(new MyReactNativePackage());
+      // packages.add(new RazorpayPackage());
       return packages;
     }
 

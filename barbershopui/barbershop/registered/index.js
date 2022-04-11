@@ -134,7 +134,7 @@ class Index extends React.PureComponent {
 	);
 
 	render() {
-		const { barberList, loading } = this.props;
+		const { barberList, fetching } = this.props;
 		const { query, visible, filterCount, clearSelection, removeFilters } =
 			this.state;
 		const data = barberList?.filter(
@@ -146,7 +146,7 @@ class Index extends React.PureComponent {
 			<View style={styles.vstyle6}>
 				<FlatList
 					style={styles.vstyle6}
-					refreshing={loading ? loading : false}
+					refreshing={fetching}
 					onRefresh={this.refresh}
 					data={data}
 					renderItem={this.renderItem}
@@ -193,7 +193,7 @@ class Index extends React.PureComponent {
 
 const mapStateToProps = (state) => ({
 	barberList: state.barbersReducer.barbers,
-	loading: state.errorReducer.loading,
+	fetching: state.errorReducer.fetching,
 	id: state.authReducer.user ? state.authReducer.user.id : null,
 	token: state.authReducer.token,
 	darkmode: state.themeReducer.darkmode,

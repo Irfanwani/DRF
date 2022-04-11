@@ -3,6 +3,7 @@ import * as actions from "../actions/types";
 initialState = {
 	error: null,
 	loading: null,
+	fetching: false
 };
 
 export default errorReducer = (state = initialState, action) => {
@@ -12,6 +13,7 @@ export default errorReducer = (state = initialState, action) => {
 				...state,
 				error: null,
 				loading: true,
+				fetching: false
 			};
 		case actions.REGISTER_FAIL:
 		case actions.EMAIL_UNVERIFIED:
@@ -26,6 +28,7 @@ export default errorReducer = (state = initialState, action) => {
 				...state,
 				error: action.payload,
 				loading: null,
+				fetching: false
 			};
 
 		case actions.EMAIL_SENT:
@@ -35,12 +38,22 @@ export default errorReducer = (state = initialState, action) => {
 				...state,
 				error: null,
 				loading: null,
+				fetching: false
 			};
+
+		case actions.FETCHING:
+			return {
+				...state,
+				error: null,
+				loading: null,
+				fetching: true
+			}
 		default:
 			return {
 				...state,
 				error: null,
 				loading: null,
+				fetching: false
 			};
 	}
 };
