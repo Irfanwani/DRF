@@ -10,6 +10,7 @@ import themeReducer from "./themeReducer";
 import newuserReducer from "./newuserReducer";
 import compeletionReducer from './compeletionReducer'
 import getservicesReducer from "./getservicesReducer";
+import reviewReducer from './reviewReducer'
 
 export default combineReducers({
 	authReducer,
@@ -21,5 +22,6 @@ export default combineReducers({
 	themeReducer,
 	newuserReducer,
 	compeletionReducer,
-	getservicesReducer
+	getservicesReducer,
+	reviewReducer
 });

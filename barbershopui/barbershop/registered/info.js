@@ -18,6 +18,7 @@ import {
 	Modal,
 	Headline,
 	HelperText,
+	useTheme,
 } from "react-native-paper";
 import RBSheet from "react-native-raw-bottom-sheet";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -29,6 +30,7 @@ import {
 	fixAppointment,
 	getAppointments,
 	removeErrors,
+	getReviews,
 } from "../redux/actions/actions2";
 
 import { getServices } from "../redux/actions/actions3";
@@ -37,9 +39,26 @@ import openMap from "react-native-open-maps";
 
 import { MultiSelect } from "../components/multiselect";
 
+import { Rating } from "react-native-ratings";
+
+import Reviews from "../components/reviews";
+
 import * as Animatable from "react-native-animatable";
 
 import styles from "../styles";
+
+const CustomRatings = ({ avg_ratings }) => {
+	const theme = useTheme();
+
+	return (
+		<Rating
+			tintColor={theme.colors.background}
+			startingValue={avg_ratings}
+			readonly={true}
+			imageSize={20}
+		/>
+	);
+};
 
 class Info extends React.PureComponent {
 	state = {
@@ -52,6 +71,7 @@ class Info extends React.PureComponent {
 		msvisible: false,
 		services: null,
 		totalcost: 0,
+		reviewvisible: false,
 	};
 
 	setDateTime = (event, datetime) => {
@@ -128,6 +148,14 @@ class Info extends React.PureComponent {
 		this.setState({ services: ss.join("|"), totalcost: total });
 	};
 
+	closeReview = () => {
+		this.setState({ reviewvisible: false });
+	};
+
+	showReviews = () => {
+		this.setState({ reviewvisible: true });
+		this.props.getReviews(this.props.route.params.props.id);
+	};
 	render() {
 		const {
 			date,
@@ -139,6 +167,7 @@ class Info extends React.PureComponent {
 			msvisible,
 			services,
 			totalcost,
+			reviewvisible,
 		} = this.state;
 		const {
 			id,
@@ -150,6 +179,7 @@ class Info extends React.PureComponent {
 			end_time,
 			about,
 			contact,
+			avg_ratings,
 		} = this.props.route.params.props;
 
 		const {
@@ -184,6 +214,24 @@ class Info extends React.PureComponent {
 						<Button uppercase={false} icon="phone" disabled={true}>
 							{contact && `${contact}`}
 						</Button>
+						{avg_ratings ? (
+							<>
+								<HelperText>Ratings: {avg_ratings}</HelperText>
+								<CustomRatings avg_ratings={avg_ratings} />
+
+								<Button
+									color="teal"
+									icon="arrow-right"
+									contentStyle={{ flexDirection: "row-reverse" }}
+									style={{ alignSelf: "flex-start" }}
+									onPress={this.showReviews}
+								>
+									Reviews
+								</Button>
+							</>
+						) : (
+							<HelperText>No Reviews!</HelperText>
+						)}
 					</View>
 				</View>
 				<View style={styles.view4}>
@@ -228,7 +276,7 @@ class Info extends React.PureComponent {
 
 				<MultiSelect
 					title="Select Services"
-					subtitle='You can select atmost 3 services'
+					subtitle="You can select atmost 3 services"
 					data={msdata}
 					visible={msvisible}
 					callback={this.callback}
@@ -387,6 +435,8 @@ class Info extends React.PureComponent {
 						</Text>
 					</Card>
 				</RBSheet>
+
+				<Reviews visible={reviewvisible} callback={this.closeReview} />
 			</View>
 		);
 	}
@@ -404,6 +454,7 @@ export default connect(mapStateToProps, {
 	getAppointments,
 	removeErrors,
 	getServices,
+	getReviews,
 })(Info);
 
 const MapLocation = (props) => {

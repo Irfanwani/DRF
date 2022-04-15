@@ -97,7 +97,6 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 	});
 	const config = setConfig(getState);
 
-
 	axios
 		.get(BASE_URL + `/addservices?id=${id}`, config)
 		.then((res) => {

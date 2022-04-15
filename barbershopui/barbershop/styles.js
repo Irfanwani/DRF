@@ -475,5 +475,17 @@ export const styles2 = StyleSheet.create({
 		margin: 3,
 	},
 
-	divider: { marginVertical: 5 }
+	divider: { marginVertical: 5 },
+
+	Astyle: {
+		position: "absolute",
+		width: Dimensions.get("window").width,
+		height: Dimensions.get("window").height,
+		padding: 30,
+		elevation: 999
+	},
+
+	ibstyle: { alignSelf: "flex-end" },
+
+	rstyle: {alignSelf: 'flex-start'}
 });

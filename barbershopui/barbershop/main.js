@@ -125,6 +125,7 @@ const DrawerScreens = (props) => {
 			}}
 			drawerContent={(props) => <CustomDrawer {...props} />}
 			useLegacyImplementation={true}
+			initialRouteName='Home'
 		>
 			<Drawer.Screen
 				options={{

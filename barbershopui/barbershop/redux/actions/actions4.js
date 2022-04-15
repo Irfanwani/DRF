@@ -11,7 +11,7 @@ import { styles2 } from "../../styles";
 const BASE_URL = "https://barbershopbackend.herokuapp.com/api/payments";
 
 export const checkout =
-	({ amount, currency, email, apnt_id }) =>
+	({ amount, currency, barber, email, apnt_id }) =>
 	(dispatch, getState) => {
 		dispatch({
 			type: LOADING,
@@ -19,12 +19,11 @@ export const checkout =
 
 		const config = setConfig(getState);
 
-		const body = JSON.stringify({ amount, currency });
+		const body = JSON.stringify({ amount, currency, barber });
 
 		axios
 			.post(BASE_URL + "/createorder", body, config)
 			.then((res) => {
-				
 				var options = {
 					description: "Make payment",
 					currency,
@@ -40,7 +39,6 @@ export const checkout =
 				RazorpayCheckout.open(options)
 					.then((data) => {
 						// handle success
-
 						const dt = JSON.stringify({ ...data, apnt_id });
 						axios
 							.put(BASE_URL + "/createorder", dt, config)
@@ -68,6 +66,7 @@ export const checkout =
 							duration: 3000,
 							style: styles2.flashstyle2,
 						});
+						dispatch({ type: GET_ERRORS });
 					});
 			})
 			.catch((err) => {

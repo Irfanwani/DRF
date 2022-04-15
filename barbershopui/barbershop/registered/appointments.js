@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { View, SectionList } from "react-native";
 import {
 	Text,
@@ -21,15 +21,20 @@ import AlertPro from "react-native-alert-pro";
 
 import { checkout } from "../redux/actions/actions4";
 
+import Ratings from "../components/ratings";
+import { addReview } from "../redux/actions/actions2";
+
 const Appointments = () => {
-	const { appointments, username, fetching, email, token } = useSelector(
-		(state) => ({
-			appointments: state.appointmentReducer.appointments,
-			username: state.authReducer.user?.username,
-			email: state.authReducer.user?.email,
-			fetching: state.errorReducer.fetching,
-		})
-	);
+	const { appointments, username, fetching, email } = useSelector((state) => ({
+		appointments: state.appointmentReducer.appointments,
+		username: state.authReducer.user?.username,
+		email: state.authReducer.user?.email,
+		fetching: state.errorReducer.fetching,
+	}));
+
+	const [visible, setVisible] = useState(false);
+	const [id, setId] = useState(null);
+	const [barber, setBarber] = useState(null);
 
 	const dispatch = useDispatch();
 	const alertprocomp = useRef([]);
@@ -47,9 +52,16 @@ const Appointments = () => {
 		alertprodel.current[id].close();
 	};
 
-	const completeApnt = (id) => {
-		dispatch(removeAppointment("completed", id, refreshPage));
+	const completeApnt = (id, barber) => {
+		setVisible(true);
+		setId(id);
+		setBarber(barber);
 		closealertcomp(id);
+	};
+
+	const callback2 = (id, barber, ratings, comments) => {
+		dispatch(removeAppointment("completed", id, refreshPage));
+		dispatch(addReview(barber, ratings, comments));
 	};
 
 	const deleteApnt = (id) => {
@@ -65,8 +77,12 @@ const Appointments = () => {
 		alertprodel.current[id].open();
 	};
 
+	const callback = () => {
+		setVisible(false);
+	};
+
 	const ActionDialogComp = (props) => {
-		const { id } = props;
+		const { id, barber } = props;
 		return (
 			<AlertPro
 				useNativeDriver={true}
@@ -76,7 +92,7 @@ const Appointments = () => {
 				textCancel="Cancel"
 				textConfirm="Complete"
 				onCancel={() => closealertcomp(id)}
-				onConfirm={() => completeApnt(id)}
+				onConfirm={() => completeApnt(id, barber, username)}
 				customStyles={{
 					container: styles2.container,
 					buttonCancel: styles2.buttonCancel,
@@ -128,8 +144,9 @@ const Appointments = () => {
 										checkout({
 											amount: item.totalcost,
 											currency: "INR",
+											barber: item.barber,
 											email: email,
-											apnt_id: item.id
+											apnt_id: item.id,
 										})
 									);
 								}}
@@ -138,16 +155,20 @@ const Appointments = () => {
 							>
 								PAY
 							</Button>
-						) : (
-							<Button color='grey' icon='check' compact>PAID</Button>
-						))}
+						) : null)}
+
+					{item.paid && (
+						<Button color="grey" icon="check" compact>
+							PAID
+						</Button>
+					)}
 				</View>
 				<View style={styles.vstyle12}>
 					<Divider />
 					<Text style={styles.tstyle7}>Booking ID: #{item.bookingID}</Text>
 				</View>
 
-				{item.user == username && (
+				{item.user == username && item.paid && (
 					<View style={styles.vstyle13}>
 						<IconButton
 							icon="check-bold"
@@ -164,7 +185,7 @@ const Appointments = () => {
 				)}
 			</Surface>
 
-			<ActionDialogComp id={item.id} />
+			<ActionDialogComp id={item.id} barber={item.barber} />
 			<ActionDialogDel id={item.id} />
 		</View>
 	);
@@ -222,6 +243,14 @@ const Appointments = () => {
 					section.data.length > 0 ? renderSectionHeader(section) : null
 				}
 				ListFooterComponent={ListFooter}
+			/>
+
+			<Ratings
+				visible={visible}
+				id={id}
+				barber={barber}
+				callback={callback}
+				callback2={callback2}
 			/>
 		</View>
 	);

@@ -26,7 +26,13 @@ export const fixAppointment =
 			.slice(0, 2)
 			.join(":");
 
-		const body = JSON.stringify({ barber, currentdatetime, datetime, services, totalcost });
+		const body = JSON.stringify({
+			barber,
+			currentdatetime,
+			datetime,
+			services,
+			totalcost,
+		});
 		axios
 			.post(BASE_URL + "/appointments", body, config)
 			.then((res) => {
@@ -76,7 +82,7 @@ export const fixAppointment =
 				})();
 			})
 			.catch((err) => {
-				console.log(err.response.data)
+				console.log(err.response.data);
 				let check = tokenCheck(err, actions.FIX_FAIL);
 				dispatch(check);
 			});
@@ -132,3 +138,70 @@ export const removeAppointment =
 export const removeErrors = () => ({
 	type: actions.GET_ERRORS,
 });
+
+// add a rating and review
+export const addReview =
+	(barber, ratings, comments) => (dispatch, getState) => {
+		const config = setConfig(getState);
+
+		const body = JSON.stringify({ barber, ratings, comments });
+
+		axios
+			.post(BASE_URL + `/reviews`, body, config)
+			.then(() => {})
+			.catch((err) => {
+				let check = tokenCheck(err, actions.GET_ERRORS);
+				dispatch(check);
+			});
+	};
+
+// get reviews of a barber
+export const getReviews = (id) => (dispatch, getState) => {
+	dispatch({
+		type: actions.LOADING,
+	});
+	const config = setConfig(getState);
+
+	axios
+		.get(BASE_URL + `/reviews?barber_id=${id}`, config)
+		.then((res) => {
+			dispatch({
+				type: actions.GET_REVIEWS,
+				payload: res.data,
+			});
+		})
+		.catch((err) => {
+			let check = tokenCheck(err, actions.GET_ERRORS);
+			dispatch(check);
+		});
+};
+
+// delete review
+export const delReview = (id, callback) => (dispatch, getState) => {
+	dispatch({
+		type: actions.LOADING,
+	});
+
+	const config = setConfig(getState);
+
+	axios
+		.delete(BASE_URL + "/reviews", {
+			data: { id },
+			...config,
+		})
+		.then(() => {
+			dispatch({
+				type: actions.GET_ERRORS,
+			});
+			showMessage({
+				message: "Comment removed",
+				type: "info",
+				icon: "info",
+			});
+			callback();
+		})
+		.catch((err) => {
+			let check = tokenCheck(err, actions.GET_ERRORS);
+			dispatch(check);
+		});
+};
