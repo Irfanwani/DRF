@@ -4,7 +4,9 @@ from accounts.models import BarberDetails, ServicesDetails, UserDetails, User
 from accounts.serializers import BankDetailsSerializer, BarberDetailSerializer, ServicesSerializer
 
 from django.contrib.gis.db.models.functions import Distance
-from django.db.models import Count
+from django.db.models import Count, Avg
+from django.db.models.functions import Round
+
 
 from django.conf import settings
 
@@ -13,6 +15,8 @@ from datetime import datetime
 import requests
 import json
 import math
+
+from haircut.models import RatingsAndReviews
 
 
 
@@ -153,9 +157,10 @@ class BarberFilter(generics.GenericAPIView):
         except:
             pass
 
+
         serializer = self.get_serializer(barbers, many=True)
 
-        [barber.update({'username': User.objects.get(id=barber['id']).username, 'Distance': [round(b.distance.km, 2)
+        [barber.update({'username': User.objects.get(id=barber['id']).username, 'avg_ratings': RatingsAndReviews.objects.filter(barber=barber['id']).aggregate(avg_ratings=Round(Avg('ratings'), 2))['avg_ratings'], 'Distance': [round(b.distance.km, 2)
                 for b in barbers if b.id == User.objects.get(id=barber['id'])][0], 'start_time': datetime.strptime(barber['start_time'], "%H:%M:%S").strftime("%I:%M %p"), 'end_time': datetime.strptime(barber['end_time'], "%H:%M:%S").strftime("%I:%M %p")}) for barber in serializer.data]
 
         return Response(serializer.data)

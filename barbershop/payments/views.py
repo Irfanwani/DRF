@@ -5,6 +5,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import permissions, status
 
 from haircut.models import Appointments
+from accounts.models import BankDetails, User
 
 from django.conf import settings
 
@@ -17,9 +18,25 @@ class CreateOrder(GenericAPIView):
 
     def post(self, request):
         try:
+            amount = int(request.data['amount'])*100
+            curr = request.data['currency']
+            account = BankDetails.objects.get(id=User.objects.get(username=request.data['barber']).id).account_id
             data = {
-                'amount': int(request.data['amount'])*100,
-                'currency': request.data['currency']
+                'amount': amount,
+                'currency': curr,
+                'transfers': [
+                    {
+                        'account': account,
+                        'amount': amount - (amount // 10),
+                        'currency': curr,
+                        'notes': {
+                            'Payment_Through': "Barbershop.com",
+                            'Sender': request.user.username
+                        },
+                        'on_hold': 0
+
+                    }
+                ]
             }
 
 
