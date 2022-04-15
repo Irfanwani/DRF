@@ -125,7 +125,7 @@ const DrawerScreens = (props) => {
 			}}
 			drawerContent={(props) => <CustomDrawer {...props} />}
 			useLegacyImplementation={true}
-			initialRouteName='Home'
+			initialRouteName="Home"
 		>
 			<Drawer.Screen
 				options={{
@@ -204,13 +204,12 @@ const UnRegisteredStack = () => {
 
 	return (
 		<PaperProvider theme={darkmode ? CustomDarkTheme : CustomDefaultTheme}>
-			
-				<Portal>
-					<Modal visible={loading} dismissable={false}>
-						<ActivityIndicator color='orange' size='large' />
-					</Modal>
-				</Portal>
-			
+			<Portal>
+				<Modal visible={loading} dismissable={false}>
+					<ActivityIndicator color="orange" size="large" />
+				</Modal>
+			</Portal>
+
 			<NavigationContainer
 				theme={darkmode ? CustomDarkTheme : CustomDefaultTheme}
 			>

@@ -25,16 +25,16 @@ const Ratings = (props) => {
 	const [comments, setComments] = useState("");
 
 	const close = () => {
-		setComments("");
-		setRatings(3);
 		callback();
 		loosefocus();
+		setComments("");
 	};
 
 	const complete = () => {
 		callback2(id, barber, ratings, comments);
 		loosefocus();
 		callback();
+		setComments("");
 	};
 
 	const loosefocus = () => {
@@ -43,11 +43,13 @@ const Ratings = (props) => {
 
 	return (
 		<Animatable.View
+			useNativeDriver={true}
+			duration={500}
 			animation={visible ? "bounceInDown" : "bounceOutDown"}
 			style={[styles2.Astyle, { backgroundColor: theme.colors.background }]}
 		>
 			<IconButton icon="close" onPress={close} style={styles2.ibstyle} />
-			<AirbnbRating onFinishRating={setRatings} />
+			<AirbnbRating defaultRating={ratings} onFinishRating={setRatings} />
 
 			<HelperText style={styles.bstyle6}>
 				Please Describe your experience with this service provider
@@ -61,7 +63,7 @@ const Ratings = (props) => {
 				maxLength={1000}
 				numberOfLines={5}
 				placeholder="Comments Here..."
-				style={[styles.view7, {maxHeight: 300}]}
+				style={[styles.view7, { maxHeight: 300 }]}
 			/>
 
 			<Button

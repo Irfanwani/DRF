@@ -19,7 +19,7 @@ import {
 import styles, { headertextcolor } from "./styles";
 
 import { useSelector, useDispatch } from "react-redux";
-import { CHANGE_THEME } from "./redux/actions/types";
+import { CHANGE_THEME, LOADING } from "./redux/actions/types";
 import { useTheme } from "@react-navigation/native";
 import { LogoutDialog } from "./options";
 
@@ -44,7 +44,11 @@ const CustomDrawer = (props) => {
 	const showlogout = () => {
 		logoutref.current.open();
 	};
-	
+
+	const changeTheme = () => {
+		dispatch({ type: CHANGE_THEME });
+	};
+
 	return (
 		<DrawerContentScrollView
 			{...props}
@@ -72,7 +76,7 @@ const CustomDrawer = (props) => {
 					color={headertextcolor}
 					style={[styles.fstyle, { backgroundColor: theme.colors.bgcolor }]}
 					icon={darkmode ? "white-balance-sunny" : "weather-night"}
-					onPress={() => dispatch({ type: CHANGE_THEME })}
+					onPress={changeTheme}
 				/>
 			</View>
 			<View style={{ backgroundColor: theme.colors.background, flex: 1 }}>

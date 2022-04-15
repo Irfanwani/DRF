@@ -7,6 +7,8 @@ import {
 	HelperText,
 	Surface,
 	useTheme,
+	Colors,
+	Text
 } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -36,7 +38,7 @@ const Reviews = (props) => {
 					{item.user == username && (
 						<IconButton
 							icon="delete"
-							color="red"
+							color={Colors.red500}
 							onPress={() => {
 								deleteReview(item.id);
 							}}
@@ -59,6 +61,8 @@ const Reviews = (props) => {
 
 	return (
 		<Animatable.View
+			useNativeDriver={true}
+			duration={500}
 			animation={visible ? "bounceInUp" : "bounceOutLeft"}
 			style={[styles2.Astyle, { backgroundColor: theme.colors.background }]}
 		>
@@ -68,6 +72,7 @@ const Reviews = (props) => {
 				data={reviews}
 				renderItem={renderItem}
 				keyExtractor={(item) => item.id.toString()}
+				ListEmptyComponent={<Text style={styles.tstyle10}>No Reviews!</Text>}
 			/>
 		</Animatable.View>
 	);

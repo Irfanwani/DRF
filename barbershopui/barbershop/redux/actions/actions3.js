@@ -100,6 +100,13 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 	axios
 		.get(BASE_URL + `/addservices?id=${id}`, config)
 		.then((res) => {
+			if (res.data.length == 0) {
+				dispatch({
+					type: GET_ERRORS,
+				});
+
+				return;
+			}
 			let result = [];
 			res.data.forEach((item) => {
 				let itm = `${item.service}		Rs.${item.cost}`;

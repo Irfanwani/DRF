@@ -102,11 +102,20 @@ export const Barber = memo((props) => {
 	const gotoInfo = () => {
 		props.navigation.navigate("Info", { props: props.item });
 	};
+
+	const changeVisible = () => {
+		setVisible(true);
+	};
+
+	const closeModal = () => {
+		setVisible(false);
+	};
+
 	return (
 		<Card>
 			<View style={styles.view2}>
 				{props.item.image ? (
-					<TouchableOpacity onPress={() => setVisible(true)}>
+					<TouchableOpacity onPress={changeVisible}>
 						<Avatar.Image
 							source={{ uri: props.item.image }}
 							size={70}
@@ -123,7 +132,7 @@ export const Barber = memo((props) => {
 				)}
 
 				<Portal>
-					<Modal visible={visible} onDismiss={() => setVisible(false)}>
+					<Modal visible={visible} onDismiss={closeModal}>
 						<Image
 							resizeMode="contain"
 							source={{ uri: props.item.image }}
