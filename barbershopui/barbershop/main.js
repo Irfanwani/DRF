@@ -277,14 +277,7 @@ const UnRegisteredStack = () => {
 export default Main = () => {
 	return (
 		<Provider store={store}>
-			<PersistGate
-				loading={
-					<View style={styles.mview}>
-						<ActivityIndicator size="large" color="black" />
-					</View>
-				}
-				persistor={persistor}
-			>
+			<PersistGate loading={<LoadingView />} persistor={persistor}>
 				<StatusBar backgroundColor="transparent" translucent={true} />
 				<UnRegisteredStack />
 				<FlashMessage position="top" style={styles2.flashstyle} />
@@ -292,3 +285,9 @@ export default Main = () => {
 		</Provider>
 	);
 };
+
+const LoadingView = () => (
+	<View style={styles.mview}>
+		<ActivityIndicator size="large" color="black" />
+	</View>
+);

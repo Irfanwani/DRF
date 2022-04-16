@@ -5,6 +5,7 @@ import {
 	FlatList,
 	TouchableOpacity,
 	ScrollView,
+	ActivityIndicator,
 } from "react-native";
 import {
 	Card,
@@ -72,7 +73,14 @@ class Info extends React.PureComponent {
 		services: null,
 		totalcost: 0,
 		reviewvisible: false,
+		isReady: false,
 	};
+
+	componentDidMount() {
+		setTimeout(() => {
+			this.setState({ isReady: true });
+		}, 500);
+	}
 
 	setDateTime = (event, datetime) => {
 		if (!datetime) {
@@ -168,6 +176,7 @@ class Info extends React.PureComponent {
 			services,
 			totalcost,
 			reviewvisible,
+			isReady,
 		} = this.state;
 		const {
 			id,
@@ -198,245 +207,254 @@ class Info extends React.PureComponent {
 		const coordinates = coords
 			? coords.slice(coords.indexOf("(") + 1, coords.indexOf(")")).split(" ")
 			: [0, 0];
-		return (
-			<View style={styles.view3}>
-				<View style={styles.infoIntro}>
-					<Animatable.Image
-						animation="bounceIn"
-						useNativeDriver={true}
-						style={styles.animatedImage}
-						source={{ uri: image }}
-					/>
 
-					<View>
-						<Headline style={styles.tstyle7}>{username}</Headline>
-						<HelperText padding="none">Distance: {Distance} km</HelperText>
-						<Button uppercase={false} icon="phone" disabled={true}>
-							{contact && `${contact}`}
-						</Button>
-						{avg_ratings ? (
-							<>
-								<HelperText>Ratings: {avg_ratings}</HelperText>
-								<CustomRatings avg_ratings={avg_ratings} />
-
-								<Button
-									color="teal"
-									icon="arrow-right"
-									contentStyle={{ flexDirection: "row-reverse" }}
-									style={{ alignSelf: "flex-start" }}
-									onPress={this.showReviews}
-								>
-									Reviews
-								</Button>
-							</>
-						) : (
-							<HelperText>No Reviews!</HelperText>
-						)}
-					</View>
-				</View>
-				<View style={styles.view4}>
-					<Text>
-						{about && (
-							<View>
-								<Title>Bio</Title>
-								<ScrollView style={styles.sstyle2}>
-									<Text style={styles.text2}>{about}</Text>
-								</ScrollView>
-							</View>
-						)}
-					</Text>
-
-					<Title>Working Hours</Title>
-					<Text style={styles.text3}>
-						{start_time} to {end_time}
-					</Text>
-
-					<Title>Location</Title>
-					<TouchableOpacity style={styles.tostyle1} onPress={this.showmodal}>
-						<MapLocation
-							coordinates={coordinates}
-							height={Dimensions.get("window").height / 5}
-							width={Dimensions.get("window").width - 10}
-							mode={mapType}
-						/>
-					</TouchableOpacity>
-				</View>
-
-				<FAB
-					color={Colors.green50}
-					icon="check"
-					style={styles.fstyle7}
-					label="fix appointment"
-					onPress={() => {
-						getServices(id, () => {
-							this.setState({ msvisible: true });
-						});
-					}}
-				/>
-
-				<MultiSelect
-					title="Select Services"
-					subtitle="You can select atmost 3 services"
-					data={msdata}
-					visible={msvisible}
-					callback={this.callback}
-					callback2={this.callback2}
-					callback3={this.callback3}
-					buttonLabel="Proceed"
-				/>
-
-				<Portal>
-					<Modal visible={modalVisible} onDismiss={this.hidemodal}>
-						<MapLocation
-							coordinates={coordinates}
-							height={Dimensions.get("window").height / 1.3}
-							width={Dimensions.get("window").width}
-							mode={mapType}
+		if (isReady) {
+			return (
+				<View style={styles.view3}>
+					<View style={styles.infoIntro}>
+						<Animatable.Image
+							animation="bounceIn"
+							useNativeDriver={true}
+							style={styles.animatedImage}
+							source={{ uri: image }}
 						/>
 
-						<FAB
-							onPress={() =>
-								openMap({
-									query: `${parseFloat(coordinates[1])},${parseFloat(
-										coordinates[0]
-									)}`,
-									end: `${parseFloat(coordinates[1])},${parseFloat(
-										coordinates[0]
-									)}`,
-									navigate: false,
-									travelType: "drive",
-								})
-							}
-							small={true}
-							style={styles.fstyle8}
-							icon="directions"
-							color={Colors.blue500}
-						/>
-
-						<FAB
-							small={true}
-							color={Colors.green800}
-							style={styles.fstyle9}
-							icon={mapType == "standard" ? "earth-box" : "earth"}
-							onPress={this.changeMap}
-						/>
-					</Modal>
-				</Portal>
-				<RBSheet
-					animationType="slide"
-					height={Dimensions.get("window").height - 30}
-					ref={(ref) => {
-						this.Fix = ref;
-					}}
-					customStyles={{
-						container: styles.rbsheet,
-					}}
-					closeOnDragDown={true}
-					dragFromTopOnly={true}
-					onClose={() => {
-						removeErrors();
-						this.setState({ date: "", time: "" });
-					}}
-				>
-					<Card style={styles.cstyle6}>
-						<Card.Title
-							title="Fix Appointment"
-							subtitle={`Fix appointment with ${username}`}
-						/>
-						<Button
-							onPress={() => {
-								this.setState({ showDTPicker: true, mode: "date" });
-							}}
-							style={styles.bstyle4}
-							mode="outlined"
-							icon="calendar-range"
-						>
-							{date ? date : "Selected Date will show here."}
-						</Button>
-						<Button
-							onPress={this.showDT1}
-							style={styles.bstyle4}
-							mode="outlined"
-							icon="clock-time-five"
-						>
-							{time ? time : "Selected Time will show here."}
-						</Button>
-
-						{showDTPicker && (
-							<DateTimePicker
-								minuteInterval={20}
-								mode={mode}
-								display="default"
-								value={new Date()}
-								onChange={this.setDateTime}
-							/>
-						)}
-
-						<Text style={styles.error}>
-							{error
-								? error.message ||
-								  (error.services
-										? "Please select some services to proceed"
-										: "")
-								: ""}
-						</Text>
-
-						<View style={styles.view5}>
-							<Button
-								onPress={() => this.Fix.close()}
-								color={Colors.grey600}
-								mode="outlined"
-								icon="window-close"
-							>
-								Cancel
+						<View>
+							<Headline style={styles.tstyle7}>{username}</Headline>
+							<HelperText padding="none">Distance: {Distance} km</HelperText>
+							<Button uppercase={false} icon="phone" disabled={true}>
+								{contact && `${contact}`}
 							</Button>
-							<Button
-								onPress={() =>
-									fixAppointment({
-										reg_username,
-										barber,
-										datetime,
-										services,
-										totalcost,
-										seeAppointments: this.seeAppointments,
-									})
-								}
-								loading={loading}
-								color={Colors.green600}
-								style={styles.bstyle5}
-								mode="contained"
-								icon="check"
-							>
-								Done
-							</Button>
-						</View>
-						<HelperText>
-							NOTE: Time can only be selected in intervals of 20 minutes
-						</HelperText>
-						<Text>
-							{error ? (
-								error.takendates ? (
-									<Card.Content>
-										<Title>Taken Spots</Title>
+							{avg_ratings ? (
+								<>
+									<HelperText>Ratings: {avg_ratings}</HelperText>
+									<CustomRatings avg_ratings={avg_ratings} />
 
-										<FlatList
-											style={styles.flstyle}
-											data={error.takendates}
-											renderItem={this.showItem}
-											keyExtractor={(item, index) => index.toString()}
-										/>
-									</Card.Content>
-								) : (
-									""
-								)
+									<Button
+										color="teal"
+										icon="arrow-right"
+										contentStyle={styles.bustyle}
+										style={styles.bstyle7}
+										onPress={this.showReviews}
+									>
+										Reviews
+									</Button>
+								</>
 							) : (
-								""
+								<HelperText>No Reviews!</HelperText>
+							)}
+						</View>
+					</View>
+					<View style={styles.view4}>
+						<Text>
+							{about && (
+								<View>
+									<Title>Bio</Title>
+									<ScrollView style={styles.sstyle2}>
+										<Text style={styles.text2}>{about}</Text>
+									</ScrollView>
+								</View>
 							)}
 						</Text>
-					</Card>
-				</RBSheet>
 
-				<Reviews visible={reviewvisible} callback={this.closeReview} />
+						<Title>Working Hours</Title>
+						<Text style={styles.text3}>
+							{start_time} to {end_time}
+						</Text>
+
+						<Title>Location</Title>
+						<TouchableOpacity style={styles.tostyle1} onPress={this.showmodal}>
+							<MapLocation
+								coordinates={coordinates}
+								height={Dimensions.get("window").height / 5}
+								width={Dimensions.get("window").width - 10}
+								mode={mapType}
+							/>
+						</TouchableOpacity>
+					</View>
+
+					<FAB
+						color={Colors.green50}
+						icon="check"
+						style={styles.fstyle7}
+						label="fix appointment"
+						onPress={() => {
+							getServices(id, () => {
+								this.setState({ msvisible: true });
+							});
+						}}
+					/>
+
+					<MultiSelect
+						title="Select Services"
+						subtitle="You can select atmost 3 services"
+						data={msdata}
+						visible={msvisible}
+						callback={this.callback}
+						callback2={this.callback2}
+						callback3={this.callback3}
+						buttonLabel="Proceed"
+					/>
+
+					<Portal>
+						<Modal visible={modalVisible} onDismiss={this.hidemodal}>
+							<MapLocation
+								coordinates={coordinates}
+								height={Dimensions.get("window").height / 1.3}
+								width={Dimensions.get("window").width}
+								mode={mapType}
+							/>
+
+							<FAB
+								onPress={() =>
+									openMap({
+										query: `${parseFloat(coordinates[1])},${parseFloat(
+											coordinates[0]
+										)}`,
+										end: `${parseFloat(coordinates[1])},${parseFloat(
+											coordinates[0]
+										)}`,
+										navigate: false,
+										travelType: "drive",
+									})
+								}
+								small={true}
+								style={styles.fstyle8}
+								icon="directions"
+								color={Colors.blue500}
+							/>
+
+							<FAB
+								small={true}
+								color={Colors.green800}
+								style={styles.fstyle9}
+								icon={mapType == "standard" ? "earth-box" : "earth"}
+								onPress={this.changeMap}
+							/>
+						</Modal>
+					</Portal>
+					<RBSheet
+						animationType="slide"
+						height={Dimensions.get("window").height - 30}
+						ref={(ref) => {
+							this.Fix = ref;
+						}}
+						customStyles={{
+							container: styles.rbsheet,
+						}}
+						closeOnDragDown={true}
+						dragFromTopOnly={true}
+						onClose={() => {
+							removeErrors();
+							this.setState({ date: "", time: "" });
+						}}
+					>
+						<Card style={styles.cstyle6}>
+							<Card.Title
+								title="Fix Appointment"
+								subtitle={`Fix appointment with ${username}`}
+							/>
+							<Button
+								onPress={() => {
+									this.setState({ showDTPicker: true, mode: "date" });
+								}}
+								style={styles.bstyle4}
+								mode="outlined"
+								icon="calendar-range"
+							>
+								{date ? date : "Selected Date will show here."}
+							</Button>
+							<Button
+								onPress={this.showDT1}
+								style={styles.bstyle4}
+								mode="outlined"
+								icon="clock-time-five"
+							>
+								{time ? time : "Selected Time will show here."}
+							</Button>
+
+							{showDTPicker && (
+								<DateTimePicker
+									minuteInterval={20}
+									mode={mode}
+									display="default"
+									value={new Date()}
+									onChange={this.setDateTime}
+								/>
+							)}
+
+							<Text style={styles.error}>
+								{error
+									? error.message ||
+									  (error.services
+											? "Please select some services to proceed"
+											: "")
+									: ""}
+							</Text>
+
+							<View style={styles.view5}>
+								<Button
+									onPress={() => this.Fix.close()}
+									color={Colors.grey600}
+									mode="outlined"
+									icon="window-close"
+								>
+									Cancel
+								</Button>
+								<Button
+									onPress={() =>
+										fixAppointment({
+											reg_username,
+											barber,
+											datetime,
+											services,
+											totalcost,
+											seeAppointments: this.seeAppointments,
+										})
+									}
+									loading={loading}
+									color={Colors.green600}
+									style={styles.bstyle5}
+									mode="contained"
+									icon="check"
+								>
+									Done
+								</Button>
+							</View>
+							<HelperText>
+								NOTE: Time can only be selected in intervals of 20 minutes
+							</HelperText>
+							<Text>
+								{error ? (
+									error.takendates ? (
+										<Card.Content>
+											<Title>Taken Spots</Title>
+
+											<FlatList
+												style={styles.flstyle}
+												data={error.takendates}
+												renderItem={this.showItem}
+												keyExtractor={(item, index) => index.toString()}
+											/>
+										</Card.Content>
+									) : (
+										""
+									)
+								) : (
+									""
+								)}
+							</Text>
+						</Card>
+					</RBSheet>
+
+					<Reviews visible={reviewvisible} callback={this.closeReview} />
+				</View>
+			);
+		}
+
+		return (
+			<View style={styles.cstyle6}>
+				<ActivityIndicator color="orange" size="large" />
 			</View>
 		);
 	}

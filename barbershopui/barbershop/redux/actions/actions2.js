@@ -82,7 +82,6 @@ export const fixAppointment =
 				})();
 			})
 			.catch((err) => {
-				console.log(err.response.data);
 				let check = tokenCheck(err, actions.FIX_FAIL);
 				dispatch(check);
 			});

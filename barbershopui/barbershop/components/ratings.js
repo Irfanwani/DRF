@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import {
 	TextInput,
@@ -21,6 +21,15 @@ const Ratings = (props) => {
 
 	const tiref = useRef();
 
+	const isFirstRender = useRef(true);
+
+	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return;
+		}
+	}, []);
+
 	const [ratings, setRatings] = useState(3);
 	const [comments, setComments] = useState("");
 
@@ -40,6 +49,10 @@ const Ratings = (props) => {
 	const loosefocus = () => {
 		tiref.current.blur();
 	};
+
+	if (isFirstRender.current) {
+		return null;
+	}
 
 	return (
 		<Animatable.View
