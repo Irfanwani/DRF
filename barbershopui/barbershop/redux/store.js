@@ -11,7 +11,7 @@ const middleware = [thunk]
 const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    blacklist: ['barbersReducer', 'appointmentReducer', 'filterReducer', 'reviewReducer']
+    blacklist: ['barbersReducer', 'appointmentReducer', 'getservicesReducer', 'reviewReducer']
 }
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

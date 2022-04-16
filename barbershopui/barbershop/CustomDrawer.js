@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 
 import { View, TouchableOpacity, Image } from "react-native";
 
@@ -19,7 +19,7 @@ import {
 import styles, { headertextcolor } from "./styles";
 
 import { useSelector, useDispatch } from "react-redux";
-import { CHANGE_THEME, LOADING } from "./redux/actions/types";
+import { CHANGE_THEME } from "./redux/actions/types";
 import { useTheme } from "@react-navigation/native";
 import { LogoutDialog } from "./options";
 
@@ -30,6 +30,18 @@ const CustomDrawer = (props) => {
 		contact: state.detailReducer.details?.contact,
 		darkmode: state.themeReducer.darkmode,
 	}));
+
+	const [pressed, setPressed] = useState(false);
+
+	const isFirstRender = useRef(true);
+
+	useEffect(() => {
+		if (isFirstRender.current) {
+			isFirstRender.current = false;
+			return;
+		}
+		dispatch({ type: CHANGE_THEME });
+	}, [pressed]);
 
 	const logoutref = useRef();
 
@@ -46,7 +58,7 @@ const CustomDrawer = (props) => {
 	};
 
 	const changeTheme = () => {
-		dispatch({ type: CHANGE_THEME });
+		setPressed((prev) => !prev);
 	};
 
 	return (

@@ -1,9 +1,12 @@
 import { Dimensions, StyleSheet } from "react-native";
 import { Colors } from "react-native-paper";
+import Constants from "expo-constants";
 
 export const backgroundcolor = Colors.teal500;
 export const headertextcolor = "white";
 export const darkbackgroundcolor = Colors.blueGrey900;
+
+const statusbarheight = Constants.statusBarHeight + 5;
 
 const styles = StyleSheet.create({
 	view: {
@@ -238,7 +241,7 @@ const styles = StyleSheet.create({
 	astyle1: { position: "absolute", bottom: 40, right: 20 },
 
 	astyle2: {
-		height: Dimensions.get("window").height / 3 + 32,
+		height: Dimensions.get("window").height / 3 + statusbarheight,
 		alignItems: "center",
 		justifyContent: "center",
 	},
@@ -253,14 +256,13 @@ const styles = StyleSheet.create({
 	cstyle2: { borderRadius: 30, marginHorizontal: 5 },
 
 	astyle3: {
-		height: Dimensions.get("window").height / 6 + 32,
+		height: Dimensions.get("window").height / 6 + statusbarheight,
 		marginLeft: 10,
 	},
 
 	cstyle3: {
 		borderTopLeftRadius: 30,
 		borderTopRightRadius: 30,
-		height: (2 * Dimensions.get("window").height) / 3,
 		height: Dimensions.get("window").height / 1.2,
 	},
 
@@ -482,10 +484,10 @@ export const styles2 = StyleSheet.create({
 		width: Dimensions.get("window").width,
 		height: Dimensions.get("window").height,
 		padding: 30,
-		elevation: 999
+		elevation: 999,
 	},
 
 	ibstyle: { alignSelf: "flex-end" },
 
-	rstyle: {alignSelf: 'flex-start'}
+	rstyle: { alignSelf: "flex-start" },
 });

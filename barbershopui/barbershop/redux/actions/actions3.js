@@ -105,6 +105,14 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 					type: GET_ERRORS,
 				});
 
+				showMessage({
+					message: "This service provider has no service details",
+					type: 'default',
+					icon: 'info',
+					position: 'bottom',
+					style: styles2.flashstyle2
+				})
+
 				return;
 			}
 			let result = [];
