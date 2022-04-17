@@ -1,7 +1,7 @@
-import { GET_BARBERS, LOGOUT_SUCCESS } from "../actions/types";
+import { FETCH_MORE, GET_BARBERS, LOGOUT_SUCCESS } from "../actions/types";
 
 initialState = {
-	barbers: null,
+	barbers: [],
 };
 
 export default barbersReducer = (state = initialState, action) => {
@@ -11,10 +11,16 @@ export default barbersReducer = (state = initialState, action) => {
 				...state,
 				barbers: action.payload,
 			};
+		
+		case FETCH_MORE:
+			return {
+				...state,
+				barbers: [...state.barbers, ...action.payload]
+			}
 		case LOGOUT_SUCCESS:
 			return {
 				...state,
-				barbers: null,
+				barbers: [],
 			};
 		default:
 			return state;

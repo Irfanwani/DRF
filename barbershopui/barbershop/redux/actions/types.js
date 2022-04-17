@@ -18,6 +18,7 @@ export const DETAIL_FAIL = "DETAIL_FAIL";
 export const DETAIL_UPDATE_FAIL = "DETAIL_UPDATE_FAIL";
 
 export const GET_BARBERS = "GET_BARBERS";
+export const FETCH_MORE = "FETCH_MORE";
 
 export const FIX_FAIL = "FIX_FAIL";
 

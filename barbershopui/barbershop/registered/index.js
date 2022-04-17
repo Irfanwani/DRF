@@ -1,10 +1,16 @@
 import React from "react";
 import { FlatList, View, TextInput } from "react-native";
 import { connect } from "react-redux";
-import { FAB, IconButton, Text, Badge } from "react-native-paper";
+import {
+	FAB,
+	IconButton,
+	Text,
+	Badge,
+	ActivityIndicator,
+} from "react-native-paper";
 import { barbers, tokenCheck } from "../redux/actions/actions";
 import { getAppointments } from "../redux/actions/actions2";
-import { GET_ERRORS } from "../redux/actions/types";
+import { FETCH_MORE, GET_ERRORS } from "../redux/actions/types";
 
 import { notification_manager } from "../notifications";
 
@@ -29,6 +35,11 @@ class Index extends React.PureComponent {
 		filterCount: 0,
 		clearSelection: false,
 		removeFilters: false,
+		getMoreData: false,
+		start: 10,
+		end: 20,
+		filterType: null,
+		selectedServiceFilters: null,
 	};
 
 	setSearch = () => {
@@ -56,13 +67,49 @@ class Index extends React.PureComponent {
 		this.setState({ clearSelection: cl, removeFilters: true });
 	};
 
+	callback3 = (selectedServiceFilters) => {
+		this.setState({ selectedServiceFilters });
+	};
+
 	cbfun = (val) => {
 		this.setState({ removeFilters: val, clearSelection: true });
 	};
 
+	cbfun2 = (filterType) => {
+		this.setState({ filterType });
+	};
+
 	refresh = () => {
 		this.props.barbers();
-		this.setState({ removeFilters: true, clearSelection: true });
+		this.setState({
+			removeFilters: true,
+			clearSelection: true,
+			filterType: null,
+			selectedServiceFilters: null,
+		});
+	};
+
+	reachedEnd = () => {
+		const { getMoreData, start, end, filterType, selectedServiceFilters } =
+			this.state;
+		if (getMoreData) {
+			this.setState(
+				(prev) => ({ getMoreData: false, start: prev.end, end: prev.end + 10 }),
+				() => {
+					this.props.barbers(
+						filterType,
+						selectedServiceFilters,
+						start,
+						end,
+						FETCH_MORE
+					);
+				}
+			);
+		}
+	};
+
+	startScroll = () => {
+		this.setState({ getMoreData: true });
 	};
 
 	componentDidMount() {
@@ -133,22 +180,33 @@ class Index extends React.PureComponent {
 		<Barber item={item} navigation={this.props.navigation} />
 	);
 
+	data = () => {
+		const { barberList } = this.props;
+		const { query } = this.state;
+		if (query) {
+			const dt =
+				barberList?.length > 0
+					? barberList.filter(
+							(barber) =>
+								barber.username.toLowerCase().includes(query.toLowerCase()) ||
+								barber.location.toLowerCase().includes(query.toLowerCase())
+					  )
+					: [];
+			return dt;
+		}
+		return barberList;
+	};
+
 	render() {
-		const { barberList, fetching } = this.props;
-		const { query, visible, filterCount, clearSelection, removeFilters } =
-			this.state;
-		const data = barberList?.filter(
-			(barber) =>
-				barber.username.toLowerCase().includes(query.toLowerCase()) ||
-				barber.location.toLowerCase().includes(query.toLowerCase())
-		);
+		const { fetching } = this.props;
+		const { visible, filterCount, clearSelection, removeFilters } = this.state;
 		return (
 			<View style={styles.vstyle6}>
 				<FlatList
 					style={styles.vstyle6}
 					refreshing={fetching}
 					onRefresh={this.refresh}
-					data={data}
+					data={this.data()}
 					renderItem={this.renderItem}
 					keyExtractor={(item) => item.id.toString()}
 					ListEmptyComponent={
@@ -158,13 +216,20 @@ class Index extends React.PureComponent {
 						<HeaderComponent
 							removeFilters={removeFilters}
 							callback={this.cbfun}
+							callback2={this.cbfun2}
 						/>
 					}
 					ListFooterComponent={
-						data?.length != 0 && (
+						this.data()?.length != 0 &&
+						(!fetching ? (
 							<Text style={styles.tstyle11}>End Reached!</Text>
-						)
+						) : (
+							<ActivityIndicator color="orange" style={styles.tstyle11} />
+						))
 					}
+					onEndReached={this.reachedEnd}
+					onEndReachedThreshold={0.1}
+					onScrollBeginDrag={this.startScroll}
 				/>
 
 				<View style={styles.fab2}>
@@ -181,8 +246,9 @@ class Index extends React.PureComponent {
 					data={serviceList}
 					visible={visible}
 					callback={this.callback}
-					clearSelection={clearSelection}
 					callback2={this.callback2}
+					callback3={this.callback3}
+					clearSelection={clearSelection}
 					barbersFilter={true}
 					buttonLabel="Apply Filter"
 				/>

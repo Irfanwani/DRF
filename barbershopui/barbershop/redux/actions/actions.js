@@ -409,7 +409,7 @@ export const details = (image, profile, userType) => (dispatch, getState) => {
 };
 
 // get barbers
-export const barbers = (selected, services) => (dispatch, getState) => {
+export const barbers = (selected, services, start, end, actionType) => (dispatch, getState) => {
 	dispatch({
 		type: actions.FETCHING,
 	});
@@ -418,18 +418,18 @@ export const barbers = (selected, services) => (dispatch, getState) => {
 	let body = null;
 
 	if (selected) {
-		body = JSON.stringify({ service_type: selected });
+		body = JSON.stringify({ service_type: selected, start, end });
 	} else if (services?.length > 0) {
-		body = JSON.stringify({ services });
+		body = JSON.stringify({ services, start, end });
 	} else {
-		body = null;
+		body = JSON.stringify({start, end});
 	}
 
 	axios
 		.post(BASE_URL + "/filterbarbers", body, config)
 		.then((res) => {
 			dispatch({
-				type: actions.GET_BARBERS,
+				type: actionType ? actionType : actions.GET_BARBERS,
 				payload: res.data,
 			});
 		})

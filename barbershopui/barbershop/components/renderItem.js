@@ -156,7 +156,7 @@ export const Barber = memo((props) => {
 
 // filtering component
 export const HeaderComponent = memo((props) => {
-	const { removeFilters, callback } = props;
+	const { removeFilters, callback, callback2 } = props;
 
 	const [selected, setSelected] = useState(null);
 
@@ -184,6 +184,7 @@ export const HeaderComponent = memo((props) => {
 
 	const select = (type) => {
 		callback(false);
+		callback2(type);
 		if (selected !== type) {
 			setSelected(type);
 		} else {
