@@ -19,7 +19,6 @@ import math
 from haircut.models import RatingsAndReviews
 
 
-
 class BankView(generics.GenericAPIView):
     permission_classes = [
         permissions.IsAuthenticated
@@ -79,15 +78,14 @@ class ServicesView(generics.GenericAPIView):
         try:
             service_provider = request.query_params['id']
 
-            queries = self.get_queryset().filter(service_provider=service_provider).values('service', 'cost')
+            queries = self.get_queryset().filter(
+                service_provider=service_provider).values('service', 'cost')
 
             return Response(queries)
         except:
             return Response({
                 'error': "There is some error. Please try again"
             }, status.HTTP_400_BAD_REQUEST)
-
-
 
     def post(self, request):
         try:
@@ -133,7 +131,7 @@ class BarberFilter(generics.GenericAPIView):
             end = request.data['end']
         except:
             start = 0
-            end = 20
+            end = 10
 
         try:
             service_type = request.data['service_type']
@@ -152,15 +150,15 @@ class BarberFilter(generics.GenericAPIView):
             queries = [i['service_provider'] for i in self.get_queryset().values('service_provider').filter(service__in=selected_services).annotate(
                 ct=Count('service_provider')).filter(ct__gte=len(selected_services)).annotate(distance=Distance('service_provider__coords', user.coords, spheroid=True)).order_by('distance')[start:end]]
 
-            barbers = BarberDetails.objects.filter(id__in=queries).annotate(distance=Distance('coords', user.coords, spheroid=True))
+            barbers = BarberDetails.objects.filter(id__in=queries).annotate(
+                distance=Distance('coords', user.coords, spheroid=True))
 
         except:
             pass
 
-
         serializer = self.get_serializer(barbers, many=True)
 
         [barber.update({'username': User.objects.get(id=barber['id']).username, 'avg_ratings': RatingsAndReviews.objects.filter(barber=barber['id']).aggregate(avg_ratings=Round(Avg('ratings'), 2))['avg_ratings'], 'Distance': [round(b.distance.km, 2)
-                for b in barbers if b.id == User.objects.get(id=barber['id'])][0], 'start_time': datetime.strptime(barber['start_time'], "%H:%M:%S").strftime("%I:%M %p"), 'end_time': datetime.strptime(barber['end_time'], "%H:%M:%S").strftime("%I:%M %p")}) for barber in serializer.data]
+                                                                                                                                                                                                                                  for b in barbers if b.id == User.objects.get(id=barber['id'])][0], 'start_time': datetime.strptime(barber['start_time'], "%H:%M:%S").strftime("%I:%M %p"), 'end_time': datetime.strptime(barber['end_time'], "%H:%M:%S").strftime("%I:%M %p")}) for barber in serializer.data]
 
         return Response(serializer.data)
