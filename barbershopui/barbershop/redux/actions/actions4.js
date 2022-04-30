@@ -27,10 +27,10 @@ export const checkout =
 				var options = {
 					description: "Make payment",
 					currency,
-					key: "rzp_test_msI2vQZUsGutaR",
-					amount: res.data.amount,
+					key: res.data.key,
+					amount: res.data.order.amount,
 					name: "Barbershop",
-					order_id: res.data.id,
+					order_id: res.data.order.id,
 					prefill: {
 						email,
 					},

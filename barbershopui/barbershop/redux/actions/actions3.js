@@ -115,16 +115,18 @@ export const getServices = (id, callback) => (dispatch, getState) => {
 
 				return;
 			}
-			let result = [];
-			res.data.forEach((item) => {
-				let itm = `${item.service}		Rs.${item.cost}`;
-				result.push(itm);
-				dispatch({
-					type: GET_SERVICES,
-					payload: result,
-				});
-				callback();
+
+			// let result = [];
+			// res.data.forEach((item) => {
+			// 	let itm = `${item.service}		Rs.${item.cost}`;
+			// 	result.push(itm);
+			// });
+
+			dispatch({
+				type: GET_SERVICES,
+				payload: res.data,
 			});
+			callback();
 		})
 		.catch((err) => {
 			let check = tokenCheck(err, FIX_FAIL);

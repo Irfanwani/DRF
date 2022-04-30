@@ -16,6 +16,24 @@ import { useTheme } from "react-native-paper";
 import { useDispatch } from "react-redux";
 import { barbers } from "../redux/actions/actions";
 
+const TextComponent = (props) => {
+	const { item } = props;
+
+	if (item.service) {
+		return (
+			<View style={styles2.vstyle}>
+				<Text style={styles2.tstyle}>{item.service}</Text>
+				<Text style={styles2.tstyle}>₹ {item.cost}</Text>
+			</View>
+		);
+	}
+	return (
+		<View style={styles2.vstyle}>
+			<Text style={styles2.tstyle}>{item}</Text>
+		</View>
+	);
+};
+
 export const MultiSelect = (props) => {
 	const {
 		title,
@@ -69,11 +87,7 @@ export const MultiSelect = (props) => {
 				style={{ marginLeft: 5 }}
 				iconStyle={{ borderRadius: 4 }}
 				fillColor={backgroundcolor}
-				textComponent={
-					<View style={styles2.vstyle}>
-						<Text style={styles2.tstyle}>{item}</Text>
-					</View>
-				}
+				textComponent={<TextComponent item={item} />}
 				isChecked={selectedItems.includes(item) ? true : false}
 			/>
 		);
@@ -106,6 +120,7 @@ export const MultiSelect = (props) => {
 				visible={visible}
 				onDismiss={callback}
 				contentContainerStyle={{
+					padding: 18,
 					marginVertical: 30,
 					backgroundColor: theme.colors.background,
 				}}

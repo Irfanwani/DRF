@@ -145,14 +145,14 @@ class Info extends React.PureComponent {
 	};
 
 	callback3 = (selectedServices) => {
+		console.log(selectedServices);
 		let ss = [];
 		let total = 0;
 		selectedServices.forEach((item) => {
-			let items = item.split("Rs.");
-			total += parseInt(items[1]);
-
-			ss.push(items[0].trim());
+			total += parseInt(item.cost);
+			ss.push(item.service);
 		});
+
 		this.setState({ services: ss.join("|"), totalcost: total });
 	};
 
@@ -164,6 +164,13 @@ class Info extends React.PureComponent {
 		this.setState({ reviewvisible: true });
 		this.props.getReviews(this.props.route.params.props.id);
 	};
+
+	showServices = () => {
+		this.props.getServices(this.props.route.params.props.id, () => {
+			this.setState({ msvisible: true });
+		});
+	};
+
 	render() {
 		const {
 			date,
@@ -179,7 +186,6 @@ class Info extends React.PureComponent {
 			isReady,
 		} = this.state;
 		const {
-			id,
 			image,
 			coords,
 			username,
@@ -197,7 +203,6 @@ class Info extends React.PureComponent {
 			fixAppointment,
 			removeErrors,
 			reg_username,
-			getServices,
 			msdata,
 		} = this.props;
 
@@ -278,11 +283,7 @@ class Info extends React.PureComponent {
 						icon="check"
 						style={styles.fstyle7}
 						label="fix appointment"
-						onPress={() => {
-							getServices(id, () => {
-								this.setState({ msvisible: true });
-							});
-						}}
+						onPress={this.showServices}
 					/>
 
 					<MultiSelect
