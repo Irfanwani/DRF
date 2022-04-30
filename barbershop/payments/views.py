@@ -9,7 +9,9 @@ from accounts.models import BankDetails, User
 
 from django.conf import settings
 
-client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
 
 class CreateOrder(GenericAPIView):
     permission_classes = [
@@ -20,7 +22,8 @@ class CreateOrder(GenericAPIView):
         try:
             amount = int(request.data['amount'])*100
             curr = request.data['currency']
-            account = BankDetails.objects.get(id=User.objects.get(username=request.data['barber']).id).account_id
+            account = BankDetails.objects.get(id=User.objects.get(
+                username=request.data['barber']).id).account_id
             data = {
                 'amount': amount,
                 'currency': curr,
@@ -39,10 +42,9 @@ class CreateOrder(GenericAPIView):
                 ]
             }
 
-
             order = client.order.create(data=data)
 
-            return Response(order)
+            return Response({'order': order, 'key': settings.RAZOR_KEY_ID})
         except:
             return Response({
                 "error": "There is some error. Please try again"
@@ -55,7 +57,7 @@ class CreateOrder(GenericAPIView):
             apnt_id = request.data['apnt_id']
 
             Appointments.objects.filter(id=apnt_id).update(paid=True)
-            
+
             return Response({
                 'message': result
             })

@@ -6,6 +6,7 @@ from accounts.serializers import BankDetailsSerializer, BarberDetailSerializer, 
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Count, Avg
 from django.db.models.functions import Round
+from django.db import transaction
 
 
 from django.conf import settings
@@ -79,7 +80,7 @@ class ServicesView(generics.GenericAPIView):
             service_provider = request.query_params['id']
 
             queries = self.get_queryset().filter(
-                service_provider=service_provider).values('service', 'cost')
+                service_provider=service_provider).values('id', 'service', 'cost')
 
             return Response(queries)
         except:
@@ -107,6 +108,23 @@ class ServicesView(generics.GenericAPIView):
                 'error': 'There is some error. Please try again'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+
+    def put(self, request):
+        try:
+            with transaction.atomic():
+                services = request.data['services_list']
+
+                for i in services:
+                    self.get_queryset().filter(id=i['id']).update(cost=i['cost'])
+
+            return Response({
+                'message': "Updated"
+            })
+        except:
+            return Response({
+                'error': 'There is some error. Please try again'
+            }, status.HTTP_400_BAD_REQUEST)
+            
 
 class BarberFilter(generics.GenericAPIView):
     serializer_class = BarberDetailSerializer
