@@ -10,7 +10,8 @@
 			]
 		],
 		"name": "Barbershop",
-		"slug": "barbershopui",
+		"displayName": "Barbershop",
+		"slug": "barbershop",
 		"version": "1.0.0",
 		"assetBundlePatterns": ["**/*"],
 		"icon": "./assets/icon.png",
