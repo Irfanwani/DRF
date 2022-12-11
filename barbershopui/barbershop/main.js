@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, StatusBar } from "react-native";
 import {
-	ProgressBar,
 	Provider as PaperProvider,
 	DarkTheme as PaperDarkTheme,
 	DefaultTheme as PaperDefaultTheme,
