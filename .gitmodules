@@ -1,3 +1,6 @@
 [submodule "barbershopui"]
 	path = barbershopui
 	url = https://github.com/irfanwani/barbershopui
+[submodule "barbershopbackend"]
+	path = barbershopbackend
+	url = https://github.com/irfanwani/barbershopbackend

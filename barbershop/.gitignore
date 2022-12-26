@@ -1,8 +1,0 @@
-.env 
-Procfile.windows
-staticfiles
-poetry.lock
-pyproject.toml
-
-.vscode/
-__pycache__/
