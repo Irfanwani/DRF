@@ -4,3 +4,6 @@
 [submodule "barbershopbackend"]
 	path = barbershopbackend
 	url = https://github.com/irfanwani/barbershopbackend
+[submodule "servicebarbershop"]
+	path = servicebarbershop
+	url = https://github.com/Irfanwani/servicebarbershop.git
